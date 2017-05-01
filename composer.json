@@ -1,0 +1,19 @@
+{
+    "name": "luketowers/oc-activitylog-plugin",
+    "type": "october-plugin",
+    "description": "Log model activity in your OctoberCMS projects",
+    "homepage": "https://github.com/LukeTowers/oc-activitylog-plugin",
+    "keywords": ["october", "octobercms", "laravel", "spatie/laravel-activitylog",  "activity", "logging", "logs"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luke Towers",
+            "email": "octobercms@luketowers.ca"
+        }
+    ],
+    "require": {
+	    "illuminate/support": "5.1.x",
+	    "spatie/laravel-activitylog": "~1.14"
+	},
+    "minimum-stability": "dev"
+}
