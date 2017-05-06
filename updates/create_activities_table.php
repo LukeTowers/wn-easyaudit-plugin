@@ -12,18 +12,17 @@ class CreateActivitiesTable extends Migration
         {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->string('log_name')->nullable()->index();
-            $table->string('description');
+            $table->string('event')->index();
+            $table->string('description')->nullable();
             $table->integer('subject_id')->nullable();
             $table->string('subject_type')->nullable();
-            $table->integer('causer_id')->nullable();
-            $table->string('causer_type')->nullable();
+            $table->integer('source_id')->nullable();
+            $table->string('source_type')->nullable();
             $table->json('properties')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+            $table->timestamp('created_at')->nullable();
             
             $table->index(['subject_id', 'subject_type']);
-            $table->index(['causer_id', 'causer_type']);
+            $table->index(['source_id', 'source_type']);
         });
     }
 
