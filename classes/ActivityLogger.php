@@ -129,13 +129,26 @@ class ActivityLogger
      * @return ActivityLogger $this
      */
     public function clear()
-    {
+    {   
+        // Trigger a before clear event
+        $originalSubject = null;
+        if ($this->validateModel($this->subject)) {
+            $originalSubject = $this->subject;
+            $originalSubject->fireEvent('activities.clear', [$this]);
+        }
+        
+        // Clear the properties
         $this->event = null;
         $this->description = null;
         $this->subject = null;
         $this->source = null;
         $this->properties = null;
         
+        // Trigger an after clear event
+        if ($originalSubject) {
+            $originalSubject->fireEvent('activities.afterClear', [$this]);
+        }
+                
         return $this;
     }
     
