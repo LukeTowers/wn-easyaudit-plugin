@@ -15,6 +15,11 @@ use LukeTowers\ActivityLog\Classes\ActivityLogger;
  *   public $implement = ['@LukeTowers.ActivityLog.Behaviors.TrackableModel'];
  *
  *   /**
+ *    * @var bool Flag to allow identical activities being logged on the same request. Default is to prevent duplicates
+ *    * /
+ *   protected $trackableAllowDuplicates = true;
+ *
+ *   /**
  *    * @var array The model events that are to be tracked as activities
  *    * /
  *   public $trackableEvents = ['save', 'create' => ['before' => true, 'after' => false]];
@@ -30,6 +35,8 @@ use LukeTowers\ActivityLog\Classes\ActivityLogger;
  *    * /
  *   public $trackableEventDescriptions = ['beforeCreate' => 'The model creation process has been started', 'afterCreate' => 'The model was created'];
  *
+ * @package luketowers/oc-activitylogger-plugin
+ * @author Luke Towers
  */
 class TrackableModel extends ModelBehaviorBase
 {
@@ -37,31 +44,40 @@ class TrackableModel extends ModelBehaviorBase
      * @var ActivityLogger Instance of an ActivityLogger to use
      */
     protected $logger;
-    
+
     /**
      * @var bool Flag for the logger being initialized yet or not
      */
     protected $loggerPopulated;
-    
+
+    /**
+     * @var array Activities run on this request already
+     */
+    protected $activitiesLogged = [];
+
     public function __construct($model)
     {
         parent::__construct($model);
-        
+
         // Load the model property that was initialized by the parent behavior
         $model = $this->model;
-        
-        
+
         // Setup the inverse of the polymorphic ActivityModel relationship to this model
         $model->morphMany['activities'] = ['LukeTowers\ActivityLog\Models\Activity', 'name' => 'subject'];
-        
+
         // Instantiate the logger, setting the subject to this model
         $this->logger = new ActivityLogger();
-        
+
+        // Prevent duplicate activities from being logged on the same request
+        if (empty($model->trackableAllowDuplicates)) {
+            $this->logger->requestActivityCache(true);
+        }
+
         // Populate the logger after loading the necessary data
         $model->bindEvent('model.afterFetch', function () use ($model) {
             $this->populateLogger($this->logger);
         }, 9999);
-        
+
         // Refresh the populated data of the logger after it gets cleared
         $model->bindEvent('activities.clear', function () {
             $this->loggerPopulated = false;
@@ -69,11 +85,11 @@ class TrackableModel extends ModelBehaviorBase
         $model->bindEvent('activities.afterClear', function ($logger) {
             $this->populateLogger($logger);
         });
-        
+
         // Setup the event tracking if desired by the model implementing this behavior
         $this->setupEventTracking($model);
     }
-    
+
     /**
      * Populate the logger object with the necessary data
      *
@@ -83,16 +99,42 @@ class TrackableModel extends ModelBehaviorBase
     {
         // Default the subject to the loaded model
         $logger->for($this->model);
-    
+
+        // Default the logName to the plugin code of the loaded model
+        // TODO: Document ability to control the log name from the model
+        $logger->inLog($this->model->trackableGetLogName($this->model));
+
         // Default the source to the currently logged in backend user (if there is one)
         $user = BackendAuth::getUser();
         if ($user) {
             $logger->by($user);
         }
-        
+
         $this->loggerPopulated = true;
     }
-    
+
+    /**
+     * Get the log name to use from the namespace of the model being tracked
+     *
+     * @param Model $model
+     * @return string $logName
+     */
+    public function trackableGetLogName($model)
+    {
+        $logName = 'default';
+        $namespaced = explode('\\', get_class($model));
+
+        if (sizeof($namespaced) === 1) {
+            $logName = $namespaced[0];
+        } elseif (sizeof($namespaced) === 3 && in_array($namespaced[0], ['Backend', 'Cms', 'System'])) {
+            $logName = 'October.' . $namespaced[0];
+        } else {
+            $logName = $namespaced[0] . '.' . $namespaced[1];
+        }
+
+        return $logName;
+    }
+
     /**
      * Setup the event tracking on the provided model
      *
@@ -103,14 +145,14 @@ class TrackableModel extends ModelBehaviorBase
         if (empty($model->trackableEvents) && !is_array($model->trackableEvents)) {
             return;
         }
-        
+
         // Create the callback function that will be triggered by every tracked event
         $callable = function () use ($model) {
             // Don't bother going any further if the logger hasn't been populated yet
             if (!$this->loggerPopulated) {
                 return;
             }
-            
+
             // Attempt to get the event that was triggered
             // NOTE: Super dirty, pretty reliant on internal October implementation of fireEvent() method
             $eventName = null;
@@ -118,12 +160,12 @@ class TrackableModel extends ModelBehaviorBase
             if (!empty($backtrace[2]['args'][0])) {
                 $eventName = $backtrace[2]['args'][0];
             }
-            
+
             // NOTE: may want to support custom model events, which would also include passing the custom
             // event's arguments to this method as well)
             $this->triggerModelActivity($model, $eventName);
         };
-        
+
         // Loop through the events to track
         foreach ($model->trackableEvents as $key => $value) {
             // Populate the name of the targeted event
@@ -133,25 +175,25 @@ class TrackableModel extends ModelBehaviorBase
             } else {
                 $event['name'] = $key;
             }
-            
+
             // Fill in the default options for this event
             $event = array_merge($event, [
                 'before' => false,
                 'after'  => true,
             ]);
-            
+
             // Listen to the before version of the event
             if ($event['before']) {
                 $model->bindEvent('model.before' . ucfirst($event['name']), $callable);
             }
-            
+
             // Listen to the after version of the event
             if ($event['after']) {
                 $model->bindEvent('model.after' . ucfirst($event['name']), $callable);
             }
         }
     }
-    
+
     /**
      * Handle logging a model event as an activity
      *
@@ -163,7 +205,7 @@ class TrackableModel extends ModelBehaviorBase
         // Initialize the default information for the activity to be logged
         $activityName = 'modelEventFired';
         $activityDescription = 'A model event was fired';
-        
+
         // Apply any custom event names / descriptions for the event that was triggered
         if (!empty($eventName)) {
             if (!empty($model->trackableEventNames[$eventName])) {
@@ -171,17 +213,17 @@ class TrackableModel extends ModelBehaviorBase
             } else {
                 $activityName = $eventName;
             }
-            
+
             if (!empty($model->trackableEventDescriptions[$eventName])) {
                 $activityDescription = $model->trackableEventDescriptions[$eventName];
             } else {
                 $activityDescription = "The $eventName internal event was fired";
             }
         }
-        
+
         $this->activity($activityName)->description($activityDescription)->log();
     }
-    
+
     /**
      * Return the logger instance to create a log entry
      *
@@ -192,11 +234,11 @@ class TrackableModel extends ModelBehaviorBase
         if (!$this->loggerPopulated) {
             throw new \Exception("The model being tracked hasn't been properly loaded yet and thus the logger is not initialized");
         }
-        
+
         if (!empty($event)) {
             $this->logger->event($event);
         }
-        
+
         return $this->logger;
     }
 }

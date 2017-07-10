@@ -12,6 +12,7 @@ class CreateActivitiesTable extends Migration
         {
             $table->engine = 'InnoDB';
             $table->increments('id');
+            $table->string('log')->default('default')->index();
             $table->string('event')->index();
             $table->string('description')->nullable();
             $table->integer('subject_id')->nullable();
@@ -20,7 +21,7 @@ class CreateActivitiesTable extends Migration
             $table->string('source_type')->nullable();
             $table->json('properties')->nullable();
             $table->timestamp('created_at')->nullable();
-            
+
             $table->index(['subject_id', 'subject_type']);
             $table->index(['source_id', 'source_type']);
         });
