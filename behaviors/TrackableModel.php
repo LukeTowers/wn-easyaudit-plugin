@@ -50,11 +50,6 @@ class TrackableModel extends ModelBehaviorBase
      */
     protected $loggerPopulated;
 
-    /**
-     * @var array Activities run on this request already
-     */
-    protected $activitiesLogged = [];
-
     public function __construct($model)
     {
         parent::__construct($model);
