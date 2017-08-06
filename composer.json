@@ -10,9 +10,5 @@
             "name": "Luke Towers",
             "email": "octobercms@luketowers.ca"
         }
-    ],
-    "require": {
-	    "illuminate/support": "5.1.x"
-	},
-    "minimum-stability": "dev"
+    ]
 }

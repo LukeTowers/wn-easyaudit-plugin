@@ -8,12 +8,12 @@ use Model;
 class Activity extends Model
 {
     use \October\Rain\Database\Traits\Validation;
-    
+
     /**
      * @var string The database table used by the model
      */
     public $table = 'luketowers_activitylog_activities';
-    
+
     /**
      * @var array Validation rules
      */
@@ -38,8 +38,7 @@ class Activity extends Model
      */
     protected $dates = ['created_at'];
     const CREATED_AT = 'created_at';
-	const UPDATED_AT = null;
-	
+
 	/**
      * Relations
      */
@@ -77,7 +76,7 @@ class Activity extends Model
             ->where('subject_type', get_class($subject))
             ->where('subject_id', $subject->getKey());
     }
-    
+
     /**
      * Scope a query to only include activities by a given source.
      *
@@ -90,5 +89,16 @@ class Activity extends Model
         return $query
             ->where('source_type', get_class($source))
             ->where('source_id', $source->getKey());
+    }
+
+    /**
+     * Disable setting the updated_at column automatically as this model doesn't support that column
+     *
+     * @param mixed $value
+     * @return $this
+     */
+    public function setUpdatedAt($value)
+    {
+        return $this;
     }
 }

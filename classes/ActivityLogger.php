@@ -296,13 +296,13 @@ class ActivityLogger
     /**
      * Check if the per-request de-duplication cache is enabled or change the state of it
      *
-     * @param bool $switch Enable or disable the per-request de-duplication cache
+     * @param bool $enable Enable or disable the per-request de-duplication cache
      * @return bool
      */
-    public function requestActivityCache($switch = null)
+    public function requestActivityCache($enable = null)
     {
-        if ($switch !== null) {
-            $this->activityCacheEnabled = $switch;
+        if ($enable !== null) {
+            $this->activityCacheEnabled = $enable;
         }
 
         return $this->activityCacheEnabled;
