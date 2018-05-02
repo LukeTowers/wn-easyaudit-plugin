@@ -8,7 +8,7 @@ use System\Classes\PluginBase;
  *
  * TODO:
  * - Activity type should perhaps be named activity action
- * - Add toggleable ability (default on) to log IP address of request that triggered the activity. Could log it in its own column, or under a _ip_address key in the properties column. If we add it as it's own column, then we wouldn't make it toggleable (but still make it nullable perhaps?)
+ * - Add toggleable ability (default on) to log IP address of request that triggered the activity. Could log it in its own column, or under a _ip_address key in the properties column. If we add it as it's own column, then we wouldn't make it toggleable (but still make it nullable perhaps?) - Add UA for more detective work
  * - General Facade for generating activity entries
  * - Documentation
  * - Implement templateable descriptions through supporting language strings, some way to provide the attributes and their assigned keys
