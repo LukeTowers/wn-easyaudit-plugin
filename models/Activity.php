@@ -1,5 +1,6 @@
 <?php namespace LukeTowers\ActivityLog\Models;
 
+use Lang;
 use Model;
 
 /**
@@ -100,5 +101,23 @@ class Activity extends Model
     public function setUpdatedAt($value)
     {
         return $this;
+    }
+
+    /**
+     * Get the source name
+     *
+     * @return string Name of the source for this activity item
+     */
+    public function getSourceNameAttribute($value)
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        if ($this->source) {
+            return $this->source->full_name;
+        } else {
+            return Lang::get('luketowers.activitylog::lang.models.activity.unknown_source');
+        }
     }
 }
