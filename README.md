@@ -26,22 +26,22 @@ class MyModel extends Model
 
     /**
      * @var bool Flag to allow identical activities being logged on the same request. Default is to prevent duplicates
-     * /
+     */
     protected $trackableAllowDuplicates = false;
 
     /**
      * @var array The model events that are to be tracked as activities
-     * /
+     */
     public $trackableEvents = ['model.afterSave', 'model.afterCreate', 'model.afterFetch'];
 
     /**
      * @var array The custom event names to override the default event names within the activity entry
-     * /
+     */
     public $trackableEventNames = ['model.afterSave' => 'updated', 'model.afterCreate' => 'created', 'model.afterFetch' => 'viewed'];
 
     /**
      * @var array The custom event descriptions to override the default event descriptions within the activity entry
-     * /
+     */
     public $trackableEventDescriptions = ['model.afterSave' => 'The model was updated', 'model.afterCreate' => 'The model was created', 'model.afterFetch' => 'The model was viewed'];
 }
 ```
