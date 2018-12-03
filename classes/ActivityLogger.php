@@ -1,10 +1,10 @@
-<?php namespace LukeTowers\ActivityLog\Classes;
+<?php namespace LukeTowers\EasyAudit\Classes;
 
 use Config;
 use ApplicationException;
 use Illuminate\Database\Eloquent\Model;
 
-use LukeTowers\ActivityLog\Models\Activity as ActivityModel;
+use LukeTowers\EasyAudit\Models\Activity as ActivityModel;
 
 /**
  * Activity Logger service class to log activities (events) on models
@@ -25,14 +25,14 @@ use LukeTowers\ActivityLog\Models\Activity as ActivityModel;
  *              ->properties(['maintenanceMode' => true])
  *              ->log('updated');
  *
- * @package luketowers/oc-activitylogger-plugin
+ * @package luketowers/oc-easyaudit-plugin
  * @author Luke Towers
  */
 class ActivityLogger
 {
-    use \LukeTowers\ActivityLog\Traits\EventHelper;
+    use \LukeTowers\EasyAudit\Traits\EventHelper;
 
-    const EVENT_PREFIX = 'luketowers.activitylog.logger';
+    const EVENT_PREFIX = 'luketowers.easyaudit.logger';
 
     /**
      * @var string The name of the event
@@ -85,7 +85,7 @@ class ActivityLogger
 
         // Deduplicate activities on the same request cycle
         if ($this->activityCacheEnabled) {
-            $cacheKey = 'luketowers.activitylog.cachedRequestActivities';
+            $cacheKey = 'luketowers.easyaudit.cachedRequestActivities';
             $this->bindEvent('afterLog', function () use ($cacheKey) {
                 $activitiesLogged = Config::get($cacheKey, []);
                 $activitiesLogged[] = $this->getHash();

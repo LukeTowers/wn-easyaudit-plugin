@@ -1,4 +1,4 @@
-<?php namespace LukeTowers\ActivityLog\Traits;
+<?php namespace LukeTowers\EasyAudit\Traits;
 
 use Event;
 
@@ -8,15 +8,15 @@ use Event;
  */
 trait EventHelper
 {
-	use \October\Rain\Support\Traits\Emitter;
+    use \October\Rain\Support\Traits\Emitter;
 
-	/**
-	 * Prefix to remove for local events
-	 * If empty will remove first section of event key: 'component.action' global would equal 'action' local
-	 * @var string
-	 * /
-	 const EVENT_PREFIX = '';
-	*/
+    /**
+     * Prefix to remove for local events
+     * If empty will remove first section of event key: 'component.action' global would equal 'action' local
+     * @var string
+     * /
+     const EVENT_PREFIX = '';
+    */
 
     /**
      * Fires a combination of local and global events. The first segment is removed
@@ -74,10 +74,10 @@ trait EventHelper
     }
 
     /**
-	 * Gets the class' event prefix
-	 */
+     * Gets the class' event prefix
+     */
     public function getEventPrefix()
     {
-	    return defined('static::EVENT_PREFIX') ? static::EVENT_PREFIX . '.' : '.';
+        return defined('static::EVENT_PREFIX') ? static::EVENT_PREFIX . '.' : '.';
     }
 }

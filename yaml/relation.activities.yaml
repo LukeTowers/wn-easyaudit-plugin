@@ -3,44 +3,44 @@
 # ===================================
 
 activities:
-    label: luketowers.activitylog::lang.models.activity.label
+    label: luketowers.easyaudit::lang.models.activity.label
     readOnly: true
     showSearch: true
     form:
         fields:
             source:
-                label: luketowers.activitylog::lang.models.activity.source_user
+                label: luketowers.easyaudit::lang.models.activity.source_user
                 type: partial
-                path: $/luketowers/activitylog/partials/field.source_user.htm
+                path: $/luketowers/easyaudit/partials/field.source_user.htm
                 span: left
-        
+
             event:
-                label: luketowers.activitylog::lang.models.activity.event
+                label: luketowers.easyaudit::lang.models.activity.event
                 type: text
                 span: right
-                
+
             description:
-                label: luketowers.activitylog::lang.models.activity.description
+                label: luketowers.easyaudit::lang.models.activity.description
                 type: textarea
                 span: left
-                
+
             created_at:
-                label: luketowers.activitylog::lang.models.activity.created_at
+                label: luketowers.easyaudit::lang.models.activity.created_at
                 type: datepicker
                 span: right
     list:
         columns:
             source_id:
-                label: luketowers.activitylog::lang.models.activity.source_user
+                label: luketowers.easyaudit::lang.models.activity.source_user
                 type: partial
-                path: $/luketowers/activitylog/partials/column.source_user.htm
-        
+                path: $/luketowers/easyaudit/partials/column.source_user.htm
+
             event:
-                label: luketowers.activitylog::lang.models.activity.event
+                label: luketowers.easyaudit::lang.models.activity.event
                 type: text
-                
+
             created_at:
-                label: luketowers.activitylog::lang.models.activity.created_at
+                label: luketowers.easyaudit::lang.models.activity.created_at
                 type: datetime
     view:
         toolbarButtons: false

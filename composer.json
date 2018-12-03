@@ -1,9 +1,9 @@
 {
-    "name": "luketowers/oc-activitylog-plugin",
+    "name": "luketowers/oc-easyaudit-plugin",
     "type": "october-plugin",
-    "description": "Log model activity in your OctoberCMS projects",
-    "homepage": "https://github.com/LukeTowers/oc-activitylog-plugin",
-    "keywords": ["october", "octobercms", "laravel", "activity", "logging", "logs"],
+    "description": "View and manage audit logs for models within your OctoberCMS projects",
+    "homepage": "https://github.com/LukeTowers/oc-easyaudit-plugin",
+    "keywords": ["october", "octobercms", "laravel", "activity", "logging", "logs", "audit", "easy audit"],
     "license": "MIT",
     "authors": [
         {

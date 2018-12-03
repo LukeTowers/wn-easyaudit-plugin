@@ -1,9 +1,10 @@
-<?php namespace LukeTowers\ActivityLog\Behaviors;
+<?php namespace LukeTowers\EasyAudit\Behaviors;
 
 use BackendAuth;
 use October\Rain\Database\ModelBehavior as ModelBehaviorBase;
 
-use LukeTowers\ActivityLog\Classes\ActivityLogger;
+use LukeTowers\EasyAudit\Models\Activity;
+use LukeTowers\EasyAudit\Classes\ActivityLogger;
 
 /**
  * Trackable model extension
@@ -12,7 +13,7 @@ use LukeTowers\ActivityLog\Classes\ActivityLogger;
  *
  * In the model class definition:
  *
- *   public $implement = ['@LukeTowers.ActivityLog.Behaviors.TrackableModel'];
+ *   public $implement = ['@LukeTowers.EasyAudit.Behaviors.TrackableModel'];
  *
  *   /**
  *    * @var bool Flag to allow identical activities being logged on the same request. Default is to prevent duplicates
@@ -22,20 +23,20 @@ use LukeTowers\ActivityLog\Classes\ActivityLogger;
  *   /**
  *    * @var array The model events that are to be tracked as activities
  *    * /
- *   public $trackableEvents = ['save', 'create' => ['before' => true, 'after' => false]];
+ *   public $trackableEvents = ['model.afterSave', 'model.beforeCreate'];
  *
  *   /**
  *    * @var array The custom event names to override the default event names within the activity entry
  *    * NOTE: if not otherwise specified, only the 'after' version of the desired event will be listened to
  *    * /
- *   public $trackableEventNames = ['beforeCreate' => 'creation_started', 'afterCreate' => 'creation_completed', 'afterUpdate' => 'updated'];
+ *   public $trackableEventNames = ['model.beforeCreate' => 'creation_started', 'model.afterCreate' => 'creation_completed', 'model.afterUpdate' => 'updated'];
  *
  *   /**
  *    * @var array The custom event descriptions to override the default event descriptions within the activity entry
  *    * /
- *   public $trackableEventDescriptions = ['beforeCreate' => 'The model creation process has been started', 'afterCreate' => 'The model was created'];
+ *   public $trackableEventDescriptions = ['model.beforeCreate' => 'The model creation process has been started', 'model.afterCreate' => 'The model was created'];
  *
- * @package luketowers/oc-activitylogger-plugin
+ * @package luketowers/oc-easyaudit-plugin
  * @author Luke Towers
  */
 class TrackableModel extends ModelBehaviorBase
@@ -58,7 +59,7 @@ class TrackableModel extends ModelBehaviorBase
         $model = $this->model;
 
         // Setup the inverse of the polymorphic ActivityModel relationship to this model
-        $model->morphMany['activities'] = ['LukeTowers\ActivityLog\Models\Activity', 'name' => 'subject'];
+        $model->morphMany['activities'] = [Activity::class, 'name' => 'subject'];
 
         // Instantiate the logger, setting the subject to this model
         $this->logger = new ActivityLogger();
@@ -162,30 +163,8 @@ class TrackableModel extends ModelBehaviorBase
         };
 
         // Loop through the events to track
-        foreach ($model->trackableEvents as $key => $value) {
-            // Populate the name of the targeted event
-            $event = [];
-            if (is_string($value)) {
-                $event['name'] = $value;
-            } else {
-                $event['name'] = $key;
-            }
-
-            // Fill in the default options for this event
-            $event = array_merge($event, [
-                'before' => false,
-                'after'  => true,
-            ]);
-
-            // Listen to the before version of the event
-            if ($event['before']) {
-                $model->bindEvent('model.before' . ucfirst($event['name']), $callable);
-            }
-
-            // Listen to the after version of the event
-            if ($event['after']) {
-                $model->bindEvent('model.after' . ucfirst($event['name']), $callable);
-            }
+        foreach ($model->trackableEvents as $event) {
+            $model->bindEvent($event, $callable);
         }
     }
 

@@ -1,10 +1,10 @@
-<?php namespace LukeTowers\ActivityLog;
+<?php namespace LukeTowers\EasyAudit;
 
 use Backend;
 use System\Classes\PluginBase;
 
 /**
- * ActivityLog Plugin Information File
+ * EasyAudit Plugin Information File
  *
  * TODO:
  * - Activity type should perhaps be named activity action
@@ -39,11 +39,11 @@ class Plugin extends PluginBase
     public function pluginDetails()
     {
         return [
-            'name'        => 'luketowers.activitylog::lang.plugin.name',
-            'description' => 'luketowers.activitylog::lang.plugin.description',
+            'name'        => 'luketowers.easyaudit::lang.plugin.name',
+            'description' => 'luketowers.easyaudit::lang.plugin.description',
             'author'      => 'LukeTowers',
             'icon'        => 'icon-list-alt',
-            'homepage'    => 'https://github.com/LukeTowers/oc-activitylog-plugin',
+            'homepage'    => 'https://github.com/LukeTowers/oc-easyaudit-plugin',
         ];
     }
 
@@ -55,28 +55,28 @@ class Plugin extends PluginBase
     public function registerPermissions()
     {
         return [
-            'luketowers.activitylog.manage_settings' => [
-                'tab'   => 'luketowers.activitylog::lang.plugin.name',
-                'label' => 'luketowers.activitylog::lang.permissions.manage_settings'
+            'luketowers.easyaudit.manage_settings' => [
+                'tab'   => 'luketowers.easyaudit::lang.plugin.name',
+                'label' => 'luketowers.easyaudit::lang.permissions.manage_settings'
             ],
         ];
     }
 
     /**
-	 * Registers the settings used by this plugin
-	 *
-	 * @return array
-	 */
+     * Registers the settings used by this plugin
+     *
+     * @return array
+     */
     public function registerSettings()
     {
         return [
             'settings' => [
-                'label'       => 'luketowers.activitylog::lang.plugin.name',
-                'description' => 'luketowers.activitylog::lang.settings.description',
+                'label'       => 'luketowers.easyaudit::lang.plugin.name',
+                'description' => 'luketowers.easyaudit::lang.settings.description',
                 'icon'        => 'icon-list-alt',
-                'url'         => Backend::url('luketowers/activitylog/settings'),
-                'keywords'    => 'activity clear refresh log activitylog',
-                'permissions' => ['luketowers.activitylog.manage_settings'],
+                'url'         => Backend::url('luketowers/easyaudit/settings'),
+                'keywords'    => 'activity clear refresh log easyaudit audit',
+                'permissions' => ['luketowers.easyaudit.manage_settings'],
             ],
         ];
     }

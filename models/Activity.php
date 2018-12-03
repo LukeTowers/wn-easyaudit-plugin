@@ -1,4 +1,4 @@
-<?php namespace LukeTowers\ActivityLog\Models;
+<?php namespace LukeTowers\EasyAudit\Models;
 
 use Lang;
 use Model;
@@ -13,7 +13,7 @@ class Activity extends Model
     /**
      * @var string The database table used by the model
      */
-    public $table = 'luketowers_activitylog_activities';
+    public $table = 'luketowers_easyaudit_activities';
 
     /**
      * @var array Validation rules
@@ -40,7 +40,7 @@ class Activity extends Model
     protected $dates = ['created_at'];
     const CREATED_AT = 'created_at';
 
-	/**
+    /**
      * Relations
      */
     public $morphTo = [
@@ -117,7 +117,7 @@ class Activity extends Model
         if ($this->source) {
             return $this->source->full_name;
         } else {
-            return Lang::get('luketowers.activitylog::lang.models.activity.unknown_source');
+            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown_source');
         }
     }
 }
