@@ -7,6 +7,7 @@
     'models' => [
         'activity' => [
             'label'          => 'Activity',
+            'label_plural'   => 'Activities',
             'event'          => 'Type',
             'description'    => 'Description',
             'subject'        => 'Subject',
