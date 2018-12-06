@@ -71,7 +71,7 @@ class TrackableModel extends ModelBehaviorBase
 
         // Ensure that the logger is setup for every event it can handle
         $callable = function () {
-            if ($this->exists) {
+            if ($this->model->exists) {
                 $this->populateLogger();
             }
         };
