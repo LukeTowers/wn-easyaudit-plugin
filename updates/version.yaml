@@ -3,3 +3,4 @@
     - create_activities_table.php
 1.0.2: 'Retrieve source name from $activity->source_name allowing for modification by extending plugins'
 2.0.0: 'Renamed plugin to EasyAudit'
+2.0.1: 'Properly initialize for all supported model events - specifically model.afterCreate'

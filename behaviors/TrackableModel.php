@@ -69,17 +69,23 @@ class TrackableModel extends ModelBehaviorBase
             $this->logger->requestActivityCache(true);
         }
 
-        // Populate the logger after loading the necessary data
-        $model->bindEvent('model.afterFetch', function () use ($model) {
-            $this->populateLogger($this->logger);
-        }, 9999);
+        // Ensure that the logger is setup for every event it can handle
+        $callable = function () {
+            if ($this->exists) {
+                $this->populateLogger();
+            }
+        };
+        foreach ($model->trackableEvents as $event) {
+            $model->bindEvent($event, $callable, 9999);
+        }
 
         // Refresh the populated data of the logger after it gets cleared
         $model->bindEvent('activities.clear', function () {
             $this->loggerPopulated = false;
         });
         $model->bindEvent('activities.afterClear', function ($logger) {
-            $this->populateLogger($logger);
+            $this->logger = $logger;
+            $this->populateLogger();
         });
 
         // Setup the event tracking if desired by the model implementing this behavior
@@ -88,22 +94,25 @@ class TrackableModel extends ModelBehaviorBase
 
     /**
      * Populate the logger object with the necessary data
-     *
-     * @param ActivityLogger $logger The logger object to populate
      */
-    protected function populateLogger($logger)
+    protected function populateLogger()
     {
+        // Don't bother initializing more than once
+        if ($this->loggerPopulated) {
+            return;
+        }
+
         // Default the subject to the loaded model
-        $logger->for($this->model);
+        $this->logger->for($this->model);
 
         // Default the logName to the plugin code of the loaded model
         // TODO: Document ability to control the log name from the model
-        $logger->inLog($this->model->trackableGetLogName($this->model));
+        $this->logger->inLog($this->model->trackableGetLogName($this->model));
 
         // Default the source to the currently logged in backend user (if there is one)
         $user = BackendAuth::getUser();
         if ($user) {
-            $logger->by($user);
+            $this->logger->by($user);
         }
 
         $this->loggerPopulated = true;
