@@ -78,6 +78,7 @@ class TrackableModel extends ModelBehaviorBase
         foreach ($model->trackableEvents as $event) {
             $model->bindEvent($event, $callable, 9999);
         }
+        $this->populateLogger();
 
         // Refresh the populated data of the logger after it gets cleared
         $model->bindEvent('activities.clear', function () {
@@ -107,7 +108,11 @@ class TrackableModel extends ModelBehaviorBase
 
         // Default the logName to the plugin code of the loaded model
         // TODO: Document ability to control the log name from the model
-        $this->logger->inLog($this->model->trackableGetLogName($this->model));
+        if ($this->model->methodExists('trackableGetLogName')) {
+            $this->logger->inLog($this->model->trackableGetLogName($this->model));
+        } else {
+            $this->logger->inLog($this->trackableGetLogName($this->model));
+        }
 
         // Default the source to the currently logged in backend user (if there is one)
         $user = BackendAuth::getUser();
