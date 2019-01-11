@@ -3,6 +3,23 @@
 # ===================================
 
 fields:
-    id:
-        label: ID
-        disabled: true
+    log:
+        label: Log
+        type: text
+        span: left
+    event:
+        label: Event
+        type: text
+        span: right
+    description:
+        label: Description
+        type: text
+        span: full
+    created_at:
+        label: Created At
+        type: text
+        span: left
+    user:
+        label: User
+        type: partial
+        span: right

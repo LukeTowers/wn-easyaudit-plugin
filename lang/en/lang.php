@@ -29,6 +29,7 @@
         'empty_log_success' => 'The system-wide audit logs have been emptied',
     ],
     'activities' => [
+        'label' => 'Audit Logs',
         'description' => 'View all activities',
     ],
 ];
