@@ -1,8 +1,21 @@
 # ===================================
 #  List Column Definitions
 # ===================================
-
+#  Log, Event, user, date range, activity details popup.
 columns:
-    id:
-        label: ID
+    log:
+        label: Log
+        type: text
+        searchable: true
+    event:
+        label: Event
+        type: text
+        searchable: true
+    description:
+        label: Description
+        type: text
+        searchable: true
+    created_at:
+        label: 'Created At'
+        type: datetime
         searchable: true

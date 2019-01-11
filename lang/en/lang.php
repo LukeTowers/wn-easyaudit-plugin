@@ -28,4 +28,7 @@
         'empty_log_confirm' => 'Are you sure you want to empty the audit logs system-wide? This is not reversible!',
         'empty_log_success' => 'The system-wide audit logs have been emptied',
     ],
+    'activities' => [
+        'description' => 'View all activities',
+    ],
 ];

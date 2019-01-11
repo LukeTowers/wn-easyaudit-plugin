@@ -78,6 +78,15 @@ class Plugin extends PluginBase
                 'keywords'    => 'activity clear refresh log easyaudit audit',
                 'permissions' => ['luketowers.easyaudit.manage_settings'],
             ],
+            'logs' => [
+                'label' => 'luketowers.easyaudit::lang.plugin.name',
+                'description' => 'luketowers.easyaudit::lang.activities.description',
+                'icon' => 'icon-list-alt',
+                'url' => Backend::url('luketowers/easyaudit/activities'),
+                'order' => 1100,
+                'permissions' => ['luketowers.easyaudit.manage_settings'],
+                'category' => \System\Classes\SettingsManager::CATEGORY_LOGS,
+            ],
         ];
     }
 }
