@@ -1,0 +1,24 @@
+scopes:
+    log:
+        label: Logs
+        type: group
+        scope: fromLog
+        modelClass: LukeTowers\EasyAudit\Models\Activity
+        options: getLogOptions
+    event:
+        label: Events
+        type: group
+        scope: withEvent
+        modelClass: LukeTowers\EasyAudit\Models\Activity
+        options: getEventOptions
+    user:
+        label: Users
+        type: group
+        scope: withUsers
+        modelClass: LukeTowers\EasyAudit\Models\Activity
+        options: getUserOptions
+    created_at:
+        label: Date Range
+        type: daterange
+        yearRange: 10
+        conditions: created_at >= ':after' AND created_at <= ':before'

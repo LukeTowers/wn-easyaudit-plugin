@@ -70,13 +70,14 @@ class Plugin extends PluginBase
     public function registerSettings()
     {
         return [
-            'settings' => [
-                'label'       => 'luketowers.easyaudit::lang.plugin.name',
-                'description' => 'luketowers.easyaudit::lang.settings.description',
-                'icon'        => 'icon-list-alt',
-                'url'         => Backend::url('luketowers/easyaudit/settings'),
-                'keywords'    => 'activity clear refresh log easyaudit audit',
+            'logs' => [
+                'label' => 'luketowers.easyaudit::lang.activities.label',
+                'description' => 'luketowers.easyaudit::lang.activities.description',
+                'icon' => 'icon-list-alt',
+                'url' => Backend::url('luketowers/easyaudit/activities'),
+                'order' => 1100,
                 'permissions' => ['luketowers.easyaudit.manage_settings'],
+                'category' => \System\Classes\SettingsManager::CATEGORY_LOGS,
             ],
         ];
     }
