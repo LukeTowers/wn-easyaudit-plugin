@@ -87,7 +87,9 @@ class Plugin extends PluginBase
                 'icon' => 'icon-eye',
                 'url' => Backend::url('luketowers/easyaudit/activities'),
                 'order' => 1100,
-                'permissions' => ['luketowers.easyaudit.activites.*'],
+                'permissions' => [
+                    'luketowers.easyaudit.activities.*',
+                ],
                 'category' => \System\Classes\SettingsManager::CATEGORY_LOGS,
             ],
         ];

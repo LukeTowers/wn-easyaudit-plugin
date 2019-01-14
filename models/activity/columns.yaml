@@ -5,6 +5,7 @@
 columns:
     source_name:
         type: text
+        label: luketowers.easyaudit::lang.models.activity.source
         searchable: false
         sortable: false
     event:
