@@ -1,21 +1,25 @@
 # ===================================
 #  List Column Definitions
 # ===================================
-#  Log, Event, user, date range, activity details popup.
+
 columns:
-    log:
-        label: Log
+    source_name:
         type: text
-        searchable: true
+        searchable: false
+        sortable: false
     event:
-        label: Event
+        label: luketowers.easyaudit::lang.models.activity.event
         type: text
         searchable: true
     description:
-        label: Description
+        label: luketowers.easyaudit::lang.models.activity.description
+        type: text
+        searchable: true
+    log:
+        label: luketowers.easyaudit::lang.models.activity.log
         type: text
         searchable: true
     created_at:
-        label: 'Created At'
+        label: luketowers.easyaudit::lang.models.activity.created_at
         type: datetime
         searchable: true

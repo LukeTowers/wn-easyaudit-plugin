@@ -1,7 +1,0 @@
-<?php
-    $record  = \LukeTowers\EasyAudit\Models\Activity::find($this->recordId);
-    $sourceType = $record->source_type;
-    $user = $sourceType::find($record->source_id);
-    $name = $user->first_name.' '.$user->last_name;
-?>
-<span class="form-control"><?=$name ?></span>

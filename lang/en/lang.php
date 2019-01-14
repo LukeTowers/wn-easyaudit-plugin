@@ -8,6 +8,7 @@
         'activity' => [
             'label'          => 'Activity',
             'label_plural'   => 'Activities',
+            'log'            => 'Log',
             'event'          => 'Type',
             'description'    => 'Description',
             'subject'        => 'Subject',
@@ -20,16 +21,26 @@
 
     'permissions' => [
         'manage_settings' => 'Manage EasyAudit Settings',
+        'activities'      => [
+            'view_all'    => 'View all activities',
+            'view_own'    => 'View own activities',
+        ],
     ],
 
     'settings'    => [
         'description'       => 'Manage EasyAudit Settings',
-        'empty_log'         => 'Empty System-Wide Audit Log',
+        'empty_log'         => 'Empty entire audit log',
         'empty_log_confirm' => 'Are you sure you want to empty the audit logs system-wide? This is not reversible!',
         'empty_log_success' => 'The system-wide audit logs have been emptied',
     ],
-    'activities' => [
-        'label' => 'Audit Logs',
-        'description' => 'View all activities',
+
+    'controllers' => [
+        'activities' => [
+            'label'       => 'Audit Log',
+            'description' => 'View the system audit log',
+            'filters'     => [
+                'created_at' => 'Between dates',
+            ],
+        ],
     ],
 ];

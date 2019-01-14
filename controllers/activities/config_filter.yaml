@@ -1,24 +1,23 @@
 scopes:
     log:
-        label: Logs
+        label: luketowers.easyaudit::lang.models.activity.log
         type: group
-        scope: fromLog
+        scope: inLog
         modelClass: LukeTowers\EasyAudit\Models\Activity
         options: getLogOptions
     event:
-        label: Events
+        label: luketowers.easyaudit::lang.models.activity.event
         type: group
         scope: withEvent
         modelClass: LukeTowers\EasyAudit\Models\Activity
         options: getEventOptions
-    user:
-        label: Users
+    source:
+        label: luketowers.easyaudit::lang.models.activity.source
         type: group
-        scope: withUsers
+        scope: fromSource
         modelClass: LukeTowers\EasyAudit\Models\Activity
-        options: getUserOptions
+        options: getSourceOptions
     created_at:
-        label: Date Range
+        label: luketowers.easyaudit::lang.controllers.activities.filters.created_at
         type: daterange
-        yearRange: 10
         conditions: created_at >= ':after' AND created_at <= ':before'

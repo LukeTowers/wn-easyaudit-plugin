@@ -3,23 +3,18 @@
 # ===================================
 
 fields:
-    log:
-        label: Log
-        type: text
+    source_name:
+        label: luketowers.easyaudit::lang.models.activity.source
         span: left
     event:
-        label: Event
-        type: text
+        label: luketowers.easyaudit::lang.models.activity.event
+        span: right
+    log:
+        label: luketowers.easyaudit::lang.models.activity.log
+        span: left
+    created_at:
+        label: luketowers.easyaudit::lang.models.activity.created_at
         span: right
     description:
-        label: Description
-        type: text
+        label: luketowers.easyaudit::lang.models.activity.description
         span: full
-    created_at:
-        label: Created At
-        type: text
-        span: left
-    user:
-        label: User
-        type: partial
-        span: right
