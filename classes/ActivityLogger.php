@@ -318,10 +318,10 @@ class ActivityLogger
         $instance = [
             'event'         => $this->event,
             'description'   => $this->description,
-            'subject_class' => get_class($this->subject),
-            'subject_key'   => @$this->subject->getKey(),
-            'source_class'  => get_class($this->source),
-            'source_key'    => @$this->source->getKey(),
+            'subject_class' => $this->subject ? get_class($this->subject) : null,
+            'subject_key'   => $this->subject ? $this->subject->getKey() : null,
+            'source_class'  => $this->source ? get_class($this->source) : null,
+            'source_key'    => $this->source ? $this->source->getKey() : null,
             'properties'    => $this->properties,
             'logName'       => $this->logName,
         ];
