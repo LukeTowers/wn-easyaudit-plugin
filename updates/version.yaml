@@ -7,3 +7,4 @@
 2.0.2: 'Minor typo'
 2.0.3: 'Fixed issues related to manually triggering events on models'
 2.1.0: 'Added a filterable system-wide audit log view'
+2.1.1: 'Fixed "Call to member function is null"'
