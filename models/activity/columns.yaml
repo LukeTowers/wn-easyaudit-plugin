@@ -20,6 +20,11 @@ columns:
         label: luketowers.easyaudit::lang.models.activity.log
         type: text
         searchable: true
+        invisible: true
+    ip_address:
+        label: luketowers.easyaudit::lang.models.activity.ip_address
+        invisible: true
+        searchable: true
     created_at:
         label: luketowers.easyaudit::lang.models.activity.created_at
         type: datetime

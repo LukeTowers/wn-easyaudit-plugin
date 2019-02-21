@@ -59,6 +59,14 @@ class Activity extends Model
         'source'  => [],
     ];
 
+
+    public function beforeSave()
+    {
+        $request = request();
+        $this->ip_address = $request->ip();
+        $this->properties = array_merge($this->properties ?? [], ['user_agent' => $request->header('User-Agent')]);
+    }
+
     /**
      * Filter activities in the provided logs
      *
@@ -116,7 +124,9 @@ class Activity extends Model
      */
     public function scopeFromSource($query, $source)
     {
-        return $query->where('source_id', $source->getKey())->where('source_type', get_class($source));
+        return $query
+            ->where('source_type', get_class($source))
+            ->where('source_id', $source->getKey());
     }
 
     /**

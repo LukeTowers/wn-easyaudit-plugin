@@ -18,3 +18,14 @@ fields:
     description:
         label: luketowers.easyaudit::lang.models.activity.description
         span: full
+
+tabs:
+    fields:
+        ip_address:
+            tab: luketowers.easyaudit::lang.models.activity.tab_request
+            label: luketowers.easyaudit::lang.models.activity.ip_address
+            span: left
+        properties[user_agent]:
+            tab: luketowers.easyaudit::lang.models.activity.tab_request
+            label: luketowers.easyaudit::lang.models.activity.user_agent
+            span: right

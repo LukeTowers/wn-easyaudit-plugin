@@ -21,7 +21,7 @@ use LukeTowers\EasyAudit\Classes\ActivityLogger;
  *   protected $trackableAllowDuplicates = true;
  *
  *   /**
- *    * @var array The model events that are to be tracked as activities
+ *    * @var array The model events that are to be tracked as activities ['event', 'event'] || ['event' => [name => 'name', description => 'description']]
  *    * /
  *   public $trackableEvents = ['model.afterSave', 'model.beforeCreate'];
  *
@@ -70,14 +70,20 @@ class TrackableModel extends ModelBehaviorBase
         }
 
         // Ensure that the logger is setup for every event it can handle
-        $callable = function () {
-            if ($this->model->exists) {
-                $this->populateLogger();
+        if (!empty($model->trackableEvents)) {
+            $callable = function () {
+                if ($this->model->exists) {
+                    $this->populateLogger();
+                }
+            };
+            foreach ($model->trackableEvents as $event => $config) {
+                if (is_string($config)) {
+                    $event = $config;
+                }
+                $model->bindEvent($event, $callable, 9999);
             }
-        };
-        foreach ($model->trackableEvents as $event) {
-            $model->bindEvent($event, $callable, 9999);
         }
+
         $this->populateLogger();
 
         // Refresh the populated data of the logger after it gets cleared
@@ -177,7 +183,11 @@ class TrackableModel extends ModelBehaviorBase
         };
 
         // Loop through the events to track
-        foreach ($model->trackableEvents as $event) {
+        foreach ($model->trackableEvents as $event => $config) {
+            if (is_string($config)) {
+                $event = $config;
+            }
+
             $model->bindEvent($event, $callable);
         }
     }
@@ -198,12 +208,16 @@ class TrackableModel extends ModelBehaviorBase
         if (!empty($eventName)) {
             if (!empty($model->trackableEventNames[$eventName])) {
                 $activityName = $model->trackableEventNames[$eventName];
+            } elseif (!empty($model->trackableEvents[$eventName]['name'])) {
+                $activityName = $model->trackableEvents[$eventName]['name'];
             } else {
                 $activityName = $eventName;
             }
 
             if (!empty($model->trackableEventDescriptions[$eventName])) {
                 $activityDescription = $model->trackableEventDescriptions[$eventName];
+            } elseif (!empty($model->trackableEvents[$eventName]['description'])) {
+                $activityDescription = $model->trackableEvents[$eventName]['description'];
             } else {
                 $activityDescription = "The $eventName internal event was fired";
             }

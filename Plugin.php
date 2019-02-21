@@ -96,6 +96,18 @@ class Plugin extends PluginBase
     }
 
     /**
+     * Register the plugin's form widgets
+     *
+     * @return array
+     */
+    public function registerFormWidgets()
+    {
+        return [
+            'LukeTowers\EasyAudit\FormWidgets\ActivityLog' => 'activitylog',
+        ];
+    }
+
+    /**
      * Runs when the plugin is booted
      *
      * @return void

@@ -1,0 +1,9 @@
+# ===================================
+#  ActivityLog Form Configuration
+# ===================================
+
+# Model Form Field configuration
+form: $/luketowers/easyaudit/models/activity/fields.yaml
+
+# Model Class name
+modelClass: LukeTowers\EasyAudit\Models\Activity

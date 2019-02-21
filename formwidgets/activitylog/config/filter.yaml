@@ -1,0 +1,21 @@
+# ===================================
+#  ActivityLog Filter Configuration
+# ===================================
+
+scopes:
+    event:
+        label: luketowers.easyaudit::lang.models.activity.event
+        type: group
+        scope: withEvent
+        modelClass: LukeTowers\EasyAudit\Models\Activity
+        options: getEventOptions
+    source:
+        label: luketowers.easyaudit::lang.models.activity.source
+        type: group
+        scope: fromSource
+        modelClass: LukeTowers\EasyAudit\Models\Activity
+        options: getSourceOptions
+    created_at:
+        label: luketowers.easyaudit::lang.controllers.activities.filters.created_at
+        type: daterange
+        conditions: created_at >= ':after' AND created_at <= ':before'
