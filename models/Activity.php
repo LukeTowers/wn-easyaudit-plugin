@@ -238,13 +238,17 @@ class Activity extends Model
      *
      * @param string $column
      * @param Model|null The subject that we're filtering options for
+     * @param Model|null The source that we're filtering options for
      * @return array
      */
-    protected function getUniquesFromColumn($column, $subject = null)
+    protected function getUniquesFromColumn($column, $subject = null, $source = null)
     {
         $query = static::select($column)->distinct($column);
         if ($subject) {
             $query->addSelect('subject_type', 'subject_id')->forSubject($subject);
+        }
+        if ($source) {
+            $query->addSelect('source_type', 'source_id')->fromSource($source);
         }
 
         $records = $query->get();
@@ -260,11 +264,12 @@ class Activity extends Model
      * Get the available logs
      *
      * @param Model|null The subject that we're filtering options for
+     * @param Model|null The source that we're filtering options for
      * @return array ['log' => 'log']
      */
-    public function getLogOptions($subject = null)
+    public function getLogOptions($subject = null, $source = null)
     {
-        $logs = $this->getUniquesFromColumn('log', $subject);
+        $logs = $this->getUniquesFromColumn('log', $subject, $source);
         return array_combine($logs, $logs);
     }
 
@@ -272,11 +277,12 @@ class Activity extends Model
      * Get the available events
      *
      * @param Model|null The subject that we're filtering options for
+     * @param Model|null The source that we're filtering options for
      * @return array ['event' => 'event']
      */
-    public function getEventOptions($subject = null)
+    public function getEventOptions($subject = null, $source = null)
     {
-        $events = $this->getUniquesFromColumn('event', $subject);
+        $events = $this->getUniquesFromColumn('event', $subject, $source);
         return array_combine($events, $events);
     }
 
@@ -284,21 +290,26 @@ class Activity extends Model
      * Get the available sources
      *
      * @param Model|null The subject that we're filtering options for
+     * @param Model|null The source that we're filtering options for
      * @return array $result ['id|type' => $activty->source_name]
      */
-    public function getSourceOptions($subject = null)
+    public function getSourceOptions($subject = null, $source = null)
     {
         $result = [];
-        $query = static::distinct('source_id', 'source_type');
+        if ($source) {
+            $result[$source->id . '|' . get_class($source)] = basename(str_replace('\\', '/', get_class($source))) . ': ' . $source->name;
+        } else {
+            $query = static::distinct('source_id', 'source_type');
 
-        if ($subject) {
-            $query->forSubject($subject);
-        }
+            if ($subject) {
+                $query->forSubject($subject);
+            }
 
-        $distinctSources =$query->get();
+            $distinctSources = $query->get();
 
-        foreach ($distinctSources as $activity) {
-            $result[$activity->source_id . '|' . $activity->source_type] = $activity->source_name;
+            foreach ($distinctSources as $activity) {
+                $result[$activity->source_id . '|' . $activity->source_type] = $activity->source_name;
+            }
         }
 
         return $result;
