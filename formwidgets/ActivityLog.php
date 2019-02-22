@@ -2,11 +2,8 @@
 
 use Model;
 use BackendAuth;
-use ApplicationException;
 use Backend\Classes\FormField;
 use Backend\Classes\FormWidgetBase;
-
-use LukeTowers\EasyAudit\Models\Activity;
 
 /**
  * ActivityLog Form Widget
@@ -32,6 +29,8 @@ use LukeTowers\EasyAudit\Models\Activity;
  */
 class ActivityLog extends FormWidgetBase
 {
+    use \LukeTowers\EasyAudit\Traits\CanViewActivityRecord;
+
     //
     // Configurable properties
     //
@@ -66,10 +65,6 @@ class ActivityLog extends FormWidgetBase
      */
     public $filter = true;
 
-    //
-    // Internal properties
-    //
-
     /**
      * @inheritDoc
      */
@@ -89,11 +84,6 @@ class ActivityLog extends FormWidgetBase
      * @var \Backend\Widgets\Lists Reference to the list widget object.
      */
     protected $listWidget;
-
-    /**
-     * @var \Backend\Widgets\Form Reference to the form widget object.
-     */
-    protected $formWidget;
 
     /**
      * @inheritDoc
@@ -116,7 +106,7 @@ class ActivityLog extends FormWidgetBase
 
         // Initialize the widgets
         $this->getListWidget();
-        $this->getFormWidget();
+        $this->getActivityRecordWidget();
     }
 
     /**
@@ -197,7 +187,7 @@ class ActivityLog extends FormWidgetBase
     /**
      * Get the Toolbar widget used by this FormWidget
      *
-     * @return Backend\Widgets\Form The intialized Toolbar widget
+     * @return Backend\Widgets\Toolbar The intialized Toolbar widget
      */
     protected function getToolbarWidget()
     {
@@ -361,58 +351,6 @@ class ActivityLog extends FormWidgetBase
     }
 
     /**
-     * Get the Form widget used by this FormWidget
-     *
-     * @return Backend\Widgets\Form The intialized Form widget
-     */
-    protected function getFormWidget()
-    {
-        if ($this->formWidget) {
-            return $this->formWidget;
-        }
-
-        // Configure the Form widget
-        $config = $this->makeConfig($this->form);
-        $config->model = $this->getCurrentActivity();
-        $config->arrayName = $this->alias . 'Form';
-        $config->isNested = true;
-
-        // Initialize the Form widget
-        $widget = $this->makeWidget('Backend\Widgets\Form', $config);
-        $widget->previewMode = true;
-        $widget->bindToController();
-
-        return $this->formWidget = $widget;
-    }
-
-    /**
-     * Get the currently active activity record
-     *
-     * @return Activity
-     */
-    protected function getCurrentActivity()
-    {
-        $activity = Activity::find(post('recordId'));
-
-        if (!$activity) {
-            $activity = new Activity;
-        }
-
-        return $activity;
-    }
-
-    /**
-     * AJAX handler to view a specific activity item's details
-     *
-     * @return string
-     */
-    public function onViewLogItemDetails()
-    {
-        $this->prepareVars();
-        return $this->makePartial('form', $this->vars, false);
-    }
-
-    /**
      * @inheritDoc
      */
     public function loadAssets()
@@ -422,7 +360,7 @@ class ActivityLog extends FormWidgetBase
     }
 
     /**
-     * Prepares the form widget view data
+     * Prepares the formwidget view data
      */
     public function prepareVars()
     {
@@ -433,7 +371,6 @@ class ActivityLog extends FormWidgetBase
         $this->vars['toolbar'] = $this->getToolbarWidget();
         $this->vars['filter']  = $this->getFilterWidget();
         $this->vars['list']    = $this->getListWidget();
-        $this->vars['form']    = $this->getFormWidget();
     }
 
     /**

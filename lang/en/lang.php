@@ -6,19 +6,19 @@
 
     'models' => [
         'activity' => [
-            'label'          => 'Activity',
-            'label_plural'   => 'Activities',
-            'log'            => 'Log',
-            'event'          => 'Type',
-            'description'    => 'Description',
-            'subject'        => 'Subject',
-            'source'         => 'Source',
-            'source_user'    => 'User',
-            'created_at'     => 'Activity Date',
-            'ip_address'     => 'IP Address',
-            'user_agent'     => 'User Agent',
-            'tab_request'    => 'Request',
-            'unknown_source' => 'Unknown source',
+            'label'        => 'Activity',
+            'label_plural' => 'Activities',
+            'log'          => 'Log',
+            'event'        => 'Action',
+            'description'  => 'Description',
+            'subject'      => 'Subject',
+            'source'       => 'Source',
+            'source_user'  => 'User',
+            'created_at'   => 'Activity Date',
+            'ip_address'   => 'IP Address',
+            'user_agent'   => 'User Agent',
+            'tab_request'  => 'Request',
+            'unknown'      => 'Unknown',
         ],
     ],
 
@@ -44,6 +44,13 @@
             'filters'     => [
                 'created_at' => 'Between dates',
             ],
+        ],
+    ],
+
+    'widgets' => [
+        'myactivities' => [
+            'label'      => 'My Activities',
+            'no_records' => 'No activities to show. The Eye of Sauron is watching...',
         ],
     ],
 ];

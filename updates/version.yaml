@@ -9,5 +9,7 @@
 2.1.0: 'Added a filterable system-wide audit log view'
 2.1.1: 'Fixed "Call to member function is null"'
 2.2.0:
-    - 'Added IP address & user agent logging, added the ActivityLog formwidget'
+    - 'Added IP address & user agent logging'
+    - 'Added the ActivityLog FormWidget'
+    - 'Added the MyActivities dashboard ReportWidget'
     - add_ip_activities.php

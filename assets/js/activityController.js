@@ -7,13 +7,15 @@
 
     var ActivityController = function () {
 
-        this.clickActivityRecord = function (recordId, sessionKey) {
+        this.clickActivityRecord = function (recordId, sessionKey, handler) {
+            handler = typeof handler !== 'undefined' ? handler : 'onViewLogItemDetails';
+
             var newPopup = $('<a />'),
                 $container = $('#' + recordId),
                 requestData = paramToObj('data-request-data', $container.data('request-data'))
 
             newPopup.popup({
-                handler: 'onClickViewList',
+                handler: handler,
                 size: 'huge',
                 extraData: $.extend({}, requestData, {
                     'recordId': recordId,

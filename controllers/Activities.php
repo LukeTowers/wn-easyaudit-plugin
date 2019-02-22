@@ -14,7 +14,7 @@ use LukeTowers\EasyAudit\Models\Activity as ActivityModel;
  */
 class Activities extends Controller
 {
-    public $recordId;
+    use \LukeTowers\EasyAudit\Traits\CanViewActivityRecord;
 
     public $implement = [
         'Backend.Behaviors.ListController'
@@ -25,20 +25,6 @@ class Activities extends Controller
 
     public function __construct()
     {
-        // Remove the source filter and filter the other filter's options to only results that
-        // would be in this view of the overall log
-        if (!static::userHasAccess('luketowers.easyaudit.activities.view_all')) {
-            $this->listConfig = $this->makeConfig($this->listConfig);
-            $this->listConfig->filter = $this->makeConfig($this->listConfig->filter);
-
-            unset($this->listConfig->filter->scopes['source']);
-            foreach ($this->listConfig->filter->scopes as &$scope) {
-                if (!empty($scope['modelClass']) && is_string($scope['options']) && class_exists($scope['modelClass'])) {
-                    $scope['options'] = (new $scope['modelClass'])->{$scope['options']}(null, BackendAuth::getUser());
-                }
-            }
-        }
-
         parent::__construct();
 
         $this->addJs('/plugins/luketowers/easyaudit/assets/js/activityController.js', 'LukeTowers.EasyAudit');
@@ -58,20 +44,6 @@ class Activities extends Controller
         }
 
         return $query;
-    }
-
-    public function onClickViewList()
-    {
-        $this->recordId = post('recordId');
-        $config = $this->makeConfig('$/luketowers/easyaudit/models/activity/fields.yaml');
-        $config->model = ActivityModel::find($this->recordId);
-
-        $popupWidget = $this->makeWidget('Backend\Widgets\Form', $config);
-        $popupWidget->previewMode = true;
-        $this->vars['popupWidget'] = $popupWidget;
-        $contents = $this->makePartial('popup', $this->vars, false);
-
-        return $contents;
     }
 
     public function index_onEmptyLog()

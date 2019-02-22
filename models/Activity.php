@@ -330,25 +330,26 @@ class Activity extends Model
         if ($this->source) {
             return basename(str_replace('\\', '/', get_class($this->source))) . ': ' . $this->source->name;
         } else {
-            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown_source');
+            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown');
         }
     }
 
     /**
-     * Get the target name
+     * Get the subject name
      *
-     * @return string Name of the target of this activity item
+     * @return string Name of the subject of this activity item
      */
-    public function getTargetNameAttribute($value)
+    public function getSubjectNameAttribute($value)
     {
         if (!empty($value)) {
             return $value;
         }
 
-        if ($this->target) {
-            return basename(str_replace('\\', '/', get_class($this->target))) . ': ' . $this->target->name;
+        if ($this->subject) {
+            $prefix = basename(str_replace('\\', '/', get_class($this->subject))) . ': ';
+            return $prefix . (!empty($this->subject->name) ? $this->subject->name : $this->subject->getKey());
         } else {
-            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown_source');
+            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown');
         }
     }
 }

@@ -8,12 +8,9 @@ use System\Classes\PluginBase;
  * EasyAudit Plugin Information File
  *
  * TODO:
- * - Activity type should perhaps be named activity action
- * - Add toggleable ability (default on) to log IP address of request that triggered the activity. Could log it in its own column, or under a _ip_address key in the properties column. If we add it as it's own column, then we wouldn't make it toggleable (but still make it nullable perhaps?) - Add UA for more detective work
  * - General Facade for generating activity entries
  * - Documentation
  * - Add trackableGetRecordName and trackableGetRecordUrl methods for the activity log to detect the name and URL for a given activity target
- * - Remove the source filter from the activities controller when the user doesn't have access to view other sources
  * - Implement templateable descriptions through supporting language strings, some way to provide the attributes and their assigned keys
  *      for being used in the language string as variables. ($activity->description(':event was triggered by :source.full_name'))
  *      To be considered: Import / export of log entries when using language strings. Reevaluate pros/cons of using translateable strings
@@ -104,6 +101,24 @@ class Plugin extends PluginBase
     {
         return [
             'LukeTowers\EasyAudit\FormWidgets\ActivityLog' => 'activitylog',
+        ];
+    }
+
+    /**
+     * Register the plugin's report widgets
+     *
+     * @return array
+     */
+    public function registerReportWidgets()
+    {
+        return [
+            'LukeTowers\EasyAudit\ReportWidgets\MyActivities' => [
+                'label'       => 'luketowers.easyaudit::lang.widgets.myactivities.label',
+                'context'     => 'dashboard',
+                'permissions' => [
+                    'luketowers.easyaudit.activities.view_own'
+                ],
+            ],
         ];
     }
 

@@ -9,8 +9,8 @@ fields:
     event:
         label: luketowers.easyaudit::lang.models.activity.event
         span: right
-    log:
-        label: luketowers.easyaudit::lang.models.activity.log
+    subject_name:
+        label: luketowers.easyaudit::lang.models.activity.subject
         span: left
     created_at:
         label: luketowers.easyaudit::lang.models.activity.created_at
@@ -29,3 +29,7 @@ tabs:
             tab: luketowers.easyaudit::lang.models.activity.tab_request
             label: luketowers.easyaudit::lang.models.activity.user_agent
             span: right
+        log:
+            tab: luketowers.easyaudit::lang.models.activity.tab_request
+            label: luketowers.easyaudit::lang.models.activity.log
+            span: left
