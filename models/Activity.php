@@ -237,11 +237,17 @@ class Activity extends Model
      * Get only the unique values for the provided column
      *
      * @param string $column
+     * @param Model|null The subject that we're filtering options for
      * @return array
      */
-    protected function getUniquesFromColumn($column)
+    protected function getUniquesFromColumn($column, $subject = null)
     {
-        $records = static::select($column)->distinct($column)->get();
+        $query = static::select($column)->distinct($column);
+        if ($subject) {
+            $query->addSelect('subject_type', 'subject_id')->forSubject($subject);
+        }
+
+        $records = $query->get();
 
         $result = [];
         foreach ($records as $record) {
@@ -253,34 +259,43 @@ class Activity extends Model
     /**
      * Get the available logs
      *
+     * @param Model|null The subject that we're filtering options for
      * @return array ['log' => 'log']
      */
-    public function getLogOptions()
+    public function getLogOptions($subject = null)
     {
-        $logs = $this->getUniquesFromColumn('log');
+        $logs = $this->getUniquesFromColumn('log', $subject);
         return array_combine($logs, $logs);
     }
 
     /**
      * Get the available events
      *
+     * @param Model|null The subject that we're filtering options for
      * @return array ['event' => 'event']
      */
-    public function getEventOptions()
+    public function getEventOptions($subject = null)
     {
-        $events = $this->getUniquesFromColumn('event');
+        $events = $this->getUniquesFromColumn('event', $subject);
         return array_combine($events, $events);
     }
 
     /**
      * Get the available sources
      *
+     * @param Model|null The subject that we're filtering options for
      * @return array $result ['id|type' => $activty->source_name]
      */
-    public function getSourceOptions()
+    public function getSourceOptions($subject = null)
     {
         $result = [];
-        $distinctSources = static::distinct('source_id', 'source_type')->get();
+        $query = static::distinct('source_id', 'source_type');
+
+        if ($subject) {
+            $query->forSubject($subject);
+        }
+
+        $distinctSources =$query->get();
 
         foreach ($distinctSources as $activity) {
             $result[$activity->source_id . '|' . $activity->source_type] = $activity->source_name;

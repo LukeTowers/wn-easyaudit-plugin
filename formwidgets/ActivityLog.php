@@ -15,7 +15,7 @@ use LukeTowers\EasyAudit\Models\Activity;
  *     form: config_form.yaml
  *     list: config_list.yaml
  *     toolbar: true | default: false
- *     filter: true | default: false
+ *     filter: false | default: true
  *     subject:
  *        - false | no filter applied
  *        - formModel | default
@@ -64,7 +64,7 @@ class ActivityLog extends FormWidgetBase
     /**
      * @var boolean Flag to indicate that the filter should be used
      */
-    public $filter = false;
+    public $filter = true;
 
     //
     // Internal properties
@@ -334,6 +334,15 @@ class ActivityLog extends FormWidgetBase
             $filterConfig->alias = $widget->alias . 'Filter';
             $filterWidget = $this->makeWidget('Backend\Widgets\Filter', $filterConfig);
             $filterWidget->bindToController();
+
+            // Limit the options by the current subject
+            $filterWidget->bindEvent('filter.extendScopesBefore', function () use ($filterWidget) {
+                foreach ($filterWidget->scopes as &$scope) {
+                    if (!empty($scope['modelClass']) && is_string($scope['options']) && class_exists($scope['modelClass'])) {
+                        $scope['options'] = (new $scope['modelClass'])->{$scope['options']}($this->getSubject());
+                    }
+                }
+            });
 
             /*
              * Filter the list when the scopes are changed
