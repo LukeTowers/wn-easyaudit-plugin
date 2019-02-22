@@ -2,6 +2,7 @@
 
 use Lang;
 use Model;
+use Config;
 
 /**
  * Activity Model
@@ -43,10 +44,9 @@ class Activity extends Model
     /**
      * Disable setting the updated_at column automatically as this model doesn't support that column
      *
-     * @param mixed $value
      * @return $this
      */
-    public function setUpdatedAt($value)
+    public function setUpdatedAt()
     {
         return $this;
     }
@@ -59,12 +59,76 @@ class Activity extends Model
         'source'  => [],
     ];
 
-
+    /**
+     * Process the activity entry before saving it
+     *
+     * @return void
+     */
     public function beforeSave()
     {
         $request = request();
-        $this->ip_address = $request->ip();
-        $this->properties = array_merge($this->properties ?? [], ['user_agent' => $request->header('User-Agent')]);
+        if ($this->canLogIpAddress()) {
+            $this->ip_address = $request->ip();
+        }
+
+        if ($this->canLogUserAgent()) {
+            $this->properties = array_merge($this->properties ?? [], ['user_agent' => $request->header('User-Agent')]);
+        }
+
+        if ($this->canTrackChanges()) {
+            // @TODO: Implement this
+        }
+    }
+
+    /**
+     * Check to see if the IP address can be logged
+     *
+     * @return bool
+     */
+    public function canLogIpAddress()
+    {
+        $can = false;
+        if (empty($this->subject->trackableDisableIpLogging)) {
+            $can = Config::get('luketowers.easyaudit.logIpAddress', true);
+        } else {
+            $can = $this->subject->trackableDisableIpLogging;
+        }
+
+        return (bool) $can;
+    }
+
+    /**
+     * Check to see if the user agent can be logged
+     *
+     * @return bool
+     */
+    public function canLogUserAgent()
+    {
+        $can = false;
+        if (empty($this->subject->trackableDisableUserAgentLogging)) {
+            $can = Config::get('luketowers.easyaudit.logUserAgent', true);
+        } else {
+            $can = $this->subject->trackableDisableUserAgentLogging;
+        }
+
+        return (bool) $can;
+    }
+
+    /**
+     * Check to see if the changed model attributes can be tracked
+     *
+     * @return bool
+     */
+    public function canTrackChanges()
+    {
+        $can = false;
+        if (empty($this->subject->trackableDisableChangeTracking)) {
+            $can = Config::get('luketowers.easyaudit.changeTracking', true);
+        } else {
+            $can = $this->subject->trackableDisableChangeTracking;
+        }
+
+        return (bool) $can;
     }
 
     /**
@@ -173,7 +237,7 @@ class Activity extends Model
      * Get only the unique values for the provided column
      *
      * @param string $column
-     * @return void
+     * @return array
      */
     protected function getUniquesFromColumn($column)
     {

@@ -16,7 +16,7 @@ use LukeTowers\EasyAudit\Classes\ActivityLogger;
  *   public $implement = ['@LukeTowers.EasyAudit.Behaviors.TrackableModel'];
  *
  *   /**
- *    * @var bool Flag to allow identical activities being logged on the same request. Default is to prevent duplicates
+ *    * @var bool Flag to allow identical activities being logged on the same request. Defaults to false
  *    * /
  *   protected $trackableAllowDuplicates = true;
  *
@@ -35,6 +35,21 @@ use LukeTowers\EasyAudit\Classes\ActivityLogger;
  *    * @var array The custom event descriptions to override the default event descriptions within the activity entry
  *    * /
  *   public $trackableEventDescriptions = ['model.beforeCreate' => 'The model creation process has been started', 'model.afterCreate' => 'The model was created'];
+ *
+ *   /**
+ *    * @var bool Disable the IP address logging on this model (default from the luketowers.easyaudit.logIpAddress configuration value negated)
+ *    * /
+ *   public $trackableDisableIpLogging = true
+ *
+ *   /**
+ *    * @var bool Disable the User agent logging on this model (default from the luketowers.easyaudit.logUserAgent configuration value negated)
+ *    * /
+ *   public $trackableDisableUserAgentLogging = true
+ *
+ *   /**
+ *    * @var bool Disable the change tracking on this model (default from the luketowers.easyaudit.trackChanges configuration value negated)
+ *    * /
+ *   public $trackableDisableChangeTracking = true
  *
  * @package luketowers/oc-easyaudit-plugin
  * @author Luke Towers
@@ -140,9 +155,9 @@ class TrackableModel extends ModelBehaviorBase
         $logName = 'default';
         $namespaced = explode('\\', get_class($model));
 
-        if (sizeof($namespaced) === 1) {
+        if (count($namespaced) === 1) {
             $logName = $namespaced[0];
-        } elseif (sizeof($namespaced) === 3 && in_array($namespaced[0], ['Backend', 'Cms', 'System'])) {
+        } elseif (count($namespaced) === 3 && in_array($namespaced[0], ['Backend', 'Cms', 'System'])) {
             $logName = 'October.' . $namespaced[0];
         } else {
             $logName = $namespaced[0] . '.' . $namespaced[1];
