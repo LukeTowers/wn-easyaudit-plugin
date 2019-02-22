@@ -46,7 +46,7 @@ class Activity extends Model
      *
      * @return $this
      */
-    public function setUpdatedAt()
+    public function setUpdatedAt($value)
     {
         return $this;
     }
