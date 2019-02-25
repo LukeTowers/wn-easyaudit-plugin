@@ -21,8 +21,6 @@ use System\Classes\PluginBase;
  * - Implement ability to enable this plugin's features on other third party plugins that don't actually have support for this plugin built in
  *      Could be very useful, especially the revisionable trait, and even just in general the ability to listen to other plugins and configure auditing for them automatically
  * - Implement ability to have configurable drivers for ouput of the tracking capabilities
- * - DONE: Implement system dashboard for viewing all logs (in the settings -> logs section probably)
- * - Implement dashboard widget for tracking activity across the site (add filtering options)
  * - Implement Revisionable / trackable properties abilities
  *      Have an option as a model property as to what events to track the revisions on, and then in the backend, you would have the ability to restore revisions (as their own incremental change), but only on the events that revisions are tracked on
  * - Implement configurable rolling log system to dump activity db contents (perhaps even create export jobs for different activity queries),
