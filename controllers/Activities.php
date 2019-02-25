@@ -25,6 +25,18 @@ class Activities extends Controller
 
     public function __construct()
     {
+        // Restrict the filter options if the user doesn't have access to view all records
+        if (!static::userHasAccess('luketowers.easyaudit.activities.view_all')) {
+            $this->listConfig = $this->makeConfig($this->listConfig);
+            $this->listConfig->filter = $this->makeConfig($this->listConfig->filter);
+
+            foreach ($this->listConfig->filter->scopes as &$scope) {
+                if (!empty($scope['modelClass']) && is_string($scope['options']) && class_exists($scope['modelClass'])) {
+                    $scope['options'] = (new $scope['modelClass'])->{$scope['options']}(null, BackendAuth::getUser());
+                }
+            }
+        }
+
         parent::__construct();
 
         $this->addJs('/plugins/luketowers/easyaudit/assets/js/activityController.js', 'LukeTowers.EasyAudit');
