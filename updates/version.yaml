@@ -12,4 +12,5 @@
     - 'Added IP address & user agent logging'
     - 'Added the ActivityLog FormWidget'
     - 'Added the MyActivities dashboard ReportWidget'
+    - 'Added the SystmeActivities dashboard ReportWidget'
     - add_ip_activities.php

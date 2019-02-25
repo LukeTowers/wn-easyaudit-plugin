@@ -315,6 +315,34 @@ class Activity extends Model
         return $result;
     }
 
+    /**
+     * Get the available subjects
+     *
+     * @param Model|null The subject that we're filtering options for
+     * @param Model|null The source that we're filtering options for
+     * @return array $result ['id|type' => $activity->source_name]
+     */
+    public function getSubjectOptions($subject = null, $source = null)
+    {
+        $result = [];
+        if ($subject) {
+            $result[$subject->id . '|' . get_class($subject)] = basename(str_replace('\\', '/', get_class($subject))) . ': ' . $subject->name;
+        } else {
+            $query = static::distinct('subject_id', 'subject_type');
+
+            if ($source) {
+                $query->fromSource($source);
+            }
+
+            $distinctSubjects = $query->get();
+
+            foreach ($distinctSubjects as $activity) {
+                $result[$activity->subject_id . '|' . $activity->subject_type] = $activity->subject_name;
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Get the source name

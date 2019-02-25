@@ -52,5 +52,9 @@
             'label'      => 'My Activities',
             'no_records' => 'No activities to show. The Eye of Sauron is watching...',
         ],
+        'systemactivities' => [
+            'label'      => 'System Activities',
+            'no_records' => 'No activities to show for the selected filters, try again with a broader perspective.',
+        ],
     ],
 ];

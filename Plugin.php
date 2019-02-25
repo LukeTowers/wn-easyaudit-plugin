@@ -119,6 +119,13 @@ class Plugin extends PluginBase
                     'luketowers.easyaudit.activities.view_own'
                 ],
             ],
+            'LukeTowers\EasyAudit\ReportWidgets\SystemActivities' => [
+                'label'       => 'luketowers.easyaudit::lang.widgets.systemactivities.label',
+                'context'     => 'dashboard',
+                'permissions' => [
+                    'luketowers.easyaudit.activities.view_all'
+                ],
+            ],
         ];
     }
 
