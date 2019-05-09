@@ -138,6 +138,11 @@ class TrackableModel extends ModelBehaviorBase
         // Default the source to the currently logged in backend user (if there is one)
         $user = BackendAuth::getUser();
         if ($user) {
+            // Ensure that impersonators are logged as the true source of the activity
+            if (BackendAuth::isImpersonator()) {
+                $user = BackendAuth::getImpersonator();
+            }
+
             $this->logger->by($user);
         }
 
