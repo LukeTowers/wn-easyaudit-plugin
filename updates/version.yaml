@@ -8,12 +8,12 @@
 2.0.3: 'Fixed issues related to manually triggering events on models'
 2.1.0: 'Added a filterable system-wide audit log view'
 2.1.1: 'Fixed "Call to member function is null"'
-3.0.0: 'Switched to paid license instead of MIT'
-3.1.0:
+2.2.0:
     - 'Added IP address & user agent logging'
     - add_ip_activities.php
-3.1.1: 'Added the ActivityLog FormWidget'
-3.1.2: 'Added the MyActivities dashboard ReportWidget'
-3.1.3: 'Added the SystemActivities dashboard ReportWidget'
-3.1.4: 'Restrict system audit log page based on user permissions'
-3.1.5: 'Detect when user impersonation is happening to log the original user instead of the impersonated one'
+3.0.0: 'Switched to paid license instead of MIT'
+3.0.1: 'Added the ActivityLog FormWidget'
+3.0.2: 'Added the MyActivities dashboard ReportWidget'
+3.0.3: 'Added the SystemActivities dashboard ReportWidget'
+3.0.4: 'Restrict system audit log page based on user permissions'
+3.0.5: 'Detect when user impersonation is happening to log the original user instead of the impersonated one'
