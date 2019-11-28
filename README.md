@@ -14,7 +14,7 @@ To install it with Composer, run `composer require luketowers/oc-easyaudit-plugi
 
 # Documentation
 
-To get started using this plugin just add a few properties to your models that you wish to track:
+To get started using this plugin just add a few properties to the models that you wish to track:
 
 ```php
 class MyModel extends Model
@@ -25,47 +25,50 @@ class MyModel extends Model
     public $implement = ['@LukeTowers.EasyAudit.Behaviors.TrackableModel'];
 
     /**
-     * @var bool Flag to allow identical activities being logged on the same request. Default is to prevent duplicates
-     */
-    protected $trackableAllowDuplicates = false;
-
-    /**
      * @var array The model events that are to be tracked as activities
      */
-    public $trackableEvents = ['model.afterSave', 'model.afterCreate', 'model.afterFetch'];
-
-    /**
-     * @var array The custom event names to override the default event names within the activity entry
-     */
-    public $trackableEventNames = ['model.afterSave' => 'updated', 'model.afterCreate' => 'created', 'model.afterFetch' => 'viewed'];
-
-    /**
-     * @var array The custom event descriptions to override the default event descriptions within the activity entry
-     */
-    public $trackableEventDescriptions = ['model.afterSave' => 'The model was updated', 'model.afterCreate' => 'The model was created', 'model.afterFetch' => 'The model was viewed'];
+    public $trackableEvents = [
+        'model.afterCreate' => ['name' => 'created', 'description' => 'The record was created'],
+        'model.afterUpdate' => ['name' => 'updated', 'description' => 'The record was updated'],
+        'model.afterDelete' => ['name' => 'archived', 'description' => 'The record was archived'],
+    ];
 }
 ```
 
-You can view a model's acitivities by including the default relation controller configuration file directly in your controller (`public $relationConfig = '$/luketowers/easyaudit/yaml/relation.activities.yaml';`) or by merging it with your existing relation config:
+Once you've added the `TrackableModel` behavior to a model, any local events fired on the model that have been set up in `$trackableEvents` will be automatically listened to and an audit record will be generated for each event.
+
+In addition to the properties above, you can also add the following properties to model classes to configure the audit logging behavior:
 
 ```php
-class MyController extends Controller
+class MyModel extends Model
 {
-    public function __construct()
-    {
-        $this->relationConfig = $this->mergeConfig($this->relationConfig, '$/luketowers/easyaudit/yaml/relation.activities.yaml');
-        parent::__construct();
-    }
+    // ...
+
+    /**
+     * @var bool Flag to allow identical activities being logged on the same request. Defaults to false
+     */
+    protected $trackableAllowDuplicates = true;
+
+    /**
+     * @var bool Disable the IP address logging on this model (default from the luketowers.easyaudit.logIpAddress configuration value negated)
+     */
+    public $trackableDisableIpLogging = true;
+
+    /**
+     * @var bool Disable the User agent logging on this model (default from the luketowers.easyaudit.logUserAgent configuration value negated)
+     */
+    public $trackableDisableUserAgentLogging = true;
 }
 ```
 
-In order to display the relation controller's views, just add the following field config to your model's `fields.yaml` file:
+You can view a model's audit log by adding a field targeting the `activities` relationship (added by the `TrackableModel` behavior) with the type of `activitylog` to the relevant `fields.yaml` files:
 
-```yaml
-_activities:
-    tab: luketowers.easyaudit::lang.models.activity.label_plural
-    type: partial
-    path: $/luketowers/easyaudit/partials/field.activities.htm
+```php
+activities:
+    tab: Audit Log
+    context: [update, preview]
+    type: activitylog
+    span: full
 ```
 
 # Advanced Usage
@@ -90,4 +93,20 @@ $activity->inLog('MyVendor.MyPlugin')
         ->description('MyModel updated')
         ->properties(['maintenanceMode' => true])
         ->log('updated');
+```
+
+Additionally, the ActivityLogger() class is available on models implementing the `LukeTowers.EasyAudit.Behaviors.TrackableModel` behavior through the `activity()` method.
+This enables you to do the following:
+
+```php
+class Asset extends Model
+{
+    // ...
+
+    public function updateInventory()
+    {
+        // ...
+        $this->activity('updated_inventory')->description("The asset's inventory was updated")->log();
+    }
+}
 ```

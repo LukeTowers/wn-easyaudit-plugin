@@ -4,7 +4,7 @@
     "description": "View and manage audit logs for models within your OctoberCMS projects",
     "homepage": "https://github.com/LukeTowers/oc-easyaudit-plugin",
     "keywords": ["october", "octobercms", "laravel", "activity", "logging", "logs", "audit", "easy audit"],
-    "license": "MIT",
+    "license": "proprietary",
     "authors": [
         {
             "name": "Luke Towers",
