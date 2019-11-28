@@ -85,11 +85,13 @@ class SystemActivities extends ReportWidgetBase
                 'options' => (new Activity)->getSourceOptions(),
             ],
 
+            // TODO: This should be implemented as a recordfinder type popup to watch a single
+            // specific record
             'subject'      => [
                 'title'   => 'Subject',
                 'default' => null,
                 'type'    => 'dropdown',
-                'options' => (new Activity)->getSubjectOptions(),
+                'options' => (new Activity)->getSubjectOptions(null, null, 10),
             ],
         ];
     }

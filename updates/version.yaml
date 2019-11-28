@@ -17,3 +17,4 @@
 3.0.3: 'Added the SystemActivities dashboard ReportWidget'
 3.0.4: 'Restrict system audit log page based on user permissions'
 3.0.5: 'Detect when user impersonation is happening to log the original user instead of the impersonated one'
+3.0.6: 'Fixed some bugs with filtering audit logs with large numbers of records'

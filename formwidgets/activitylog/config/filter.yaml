@@ -12,7 +12,7 @@ scopes:
     source:
         label: luketowers.easyaudit::lang.models.activity.source
         type: group
-        scope: fromSource
+        scope: fromSources
         modelClass: LukeTowers\EasyAudit\Models\Activity
         options: getSourceOptions
     created_at:

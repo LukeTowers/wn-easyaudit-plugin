@@ -291,9 +291,9 @@ class Activity extends Model
      *
      * @param Model|null The subject that we're filtering options for
      * @param Model|null The source that we're filtering options for
-     * @return array $result ['id|type' => $activty->source_name]
+     * @return array $result ['id|type' => $activity->source_name]
      */
-    public function getSourceOptions($subject = null, $source = null)
+    public function getSourceOptions($subject = null, $source = null, $limit = 500)
     {
         $result = [];
         if ($source) {
@@ -305,7 +305,7 @@ class Activity extends Model
                 $query->forSubject($subject);
             }
 
-            $distinctSources = $query->get();
+            $distinctSources = $query->limit($limit)->get();
 
             foreach ($distinctSources as $activity) {
                 $result[$activity->source_id . '|' . $activity->source_type] = $activity->source_name;
@@ -322,7 +322,7 @@ class Activity extends Model
      * @param Model|null The source that we're filtering options for
      * @return array $result ['id|type' => $activity->source_name]
      */
-    public function getSubjectOptions($subject = null, $source = null)
+    public function getSubjectOptions($subject = null, $source = null, $limit = 500)
     {
         $result = [];
         if ($subject) {
@@ -334,7 +334,7 @@ class Activity extends Model
                 $query->fromSource($source);
             }
 
-            $distinctSubjects = $query->get();
+            $distinctSubjects = $query->limit($limit)->get();
 
             foreach ($distinctSubjects as $activity) {
                 $result[$activity->subject_id . '|' . $activity->subject_type] = $activity->subject_name;
