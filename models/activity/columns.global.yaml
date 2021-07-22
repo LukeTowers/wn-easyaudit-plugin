@@ -1,0 +1,36 @@
+# ===================================
+#  List Column Definitions
+# ===================================
+
+columns:
+    source_name:
+        type: text
+        label: luketowers.easyaudit::lang.models.activity.source
+        searchable: false
+        sortable: false
+    event:
+        label: luketowers.easyaudit::lang.models.activity.event
+        type: text
+        searchable: true
+    subject_name:
+        type: text
+        label: luketowers.easyaudit::lang.models.activity.subject
+        searchable: false
+        sortable: false
+    description:
+        label: luketowers.easyaudit::lang.models.activity.description
+        type: text
+        searchable: true
+    log:
+        label: luketowers.easyaudit::lang.models.activity.log
+        type: text
+        searchable: true
+        invisible: true
+    ip_address:
+        label: luketowers.easyaudit::lang.models.activity.ip_address
+        invisible: true
+        searchable: true
+    created_at:
+        label: luketowers.easyaudit::lang.models.activity.created_at
+        type: datetime
+        searchable: true

@@ -9,7 +9,7 @@ list: $/luketowers/easyaudit/models/activity/columns.yaml
 modelClass: LukeTowers\EasyAudit\Models\Activity
 
 # Link URL for each record
-recordOnClick: '$.oc.activityLogWidget.clickActivityRecord(:id)'
+recordOnClick: '$.oc.activityLogWidget.clickActivityRecord(:id, this)'
 
 # Message to display if the list is empty
 noRecordsMessage: backend::lang.list.no_records

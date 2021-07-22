@@ -82,7 +82,7 @@ class SystemActivities extends ReportWidgetBase
                 'title'   => 'Source',
                 'default' => null,
                 'type'    => 'dropdown',
-                'options' => (new Activity)->getSourceOptions(),
+                'placeholder' => 'Select...',
             ],
 
             // TODO: This should be implemented as a recordfinder type popup to watch a single
@@ -91,9 +91,19 @@ class SystemActivities extends ReportWidgetBase
                 'title'   => 'Subject',
                 'default' => null,
                 'type'    => 'dropdown',
-                'options' => (new Activity)->getSubjectOptions(null, null, 10),
+                'placeholder' => 'Select...',
             ],
         ];
+    }
+
+    public function getSourceOptions()
+    {
+        return (new Activity)->getSourceOptions();
+    }
+
+    public function getSubjectOptions()
+    {
+        return (new Activity)->getSubjectOptions(null, null, 10);
     }
 
     /**

@@ -3,7 +3,7 @@
 # ===================================
 
 # Model List Column configuration
-list: $/luketowers/easyaudit/models/activity/columns.yaml
+list: $/luketowers/easyaudit/models/activity/columns.global.yaml
 
 # Model Class name
 modelClass: LukeTowers\EasyAudit\Models\Activity
@@ -14,7 +14,7 @@ title: Manage Activities
 # Link URL for each record
 recordUrl: luketowers/easyaudit/activities/update/:id
 
-recordOnClick: '$.oc.activityController.clickActivityRecord(:id)'
+recordOnClick: '$.oc.activityController.clickActivityRecord(:id, this)'
 
 # Message to display if the list is empty
 noRecordsMessage: backend::lang.list.no_records

@@ -55,7 +55,7 @@ trait CanViewActivityRecord
      */
     protected function getCurrentActivity()
     {
-        $activity = Activity::find(post('recordId'));
+        $activity = Activity::find(post('luketowers-easyaudit-recordId'));
 
         if (!$activity) {
             $activity = new Activity;
