@@ -41,7 +41,7 @@ class Activities extends Controller
 
         $this->addJs('/plugins/luketowers/easyaudit/assets/js/activityController.js', 'LukeTowers.EasyAudit');
 
-        BackendMenu::setContext('October.System', 'system', 'settings');
+        BackendMenu::setContext('Winter.System', 'system', 'settings');
         SettingsManager::setContext('LukeTowers.EasyAudit', 'logs');
     }
 

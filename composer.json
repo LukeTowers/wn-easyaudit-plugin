@@ -1,14 +1,14 @@
 {
-    "name": "luketowers/oc-easyaudit-plugin",
-    "type": "october-plugin",
-    "description": "View and manage audit logs for models within your OctoberCMS projects",
-    "homepage": "https://github.com/LukeTowers/oc-easyaudit-plugin",
-    "keywords": ["october", "octobercms", "laravel", "activity", "logging", "logs", "audit", "easy audit"],
+    "name": "luketowers/wn-easyaudit-plugin",
+    "type": "winter-plugin",
+    "description": "View and manage audit logs for models within your Winter CMS projects",
+    "homepage": "https://github.com/LukeTowers/wn-easyaudit-plugin",
+    "keywords": ["winter", "wintercms", "laravel", "activity", "logging", "logs", "audit", "easy audit"],
     "license": "proprietary",
     "authors": [
         {
             "name": "Luke Towers",
-            "email": "octobercms@luketowers.ca"
+            "email": "wintercms@luketowers.ca"
         }
     ]
 }

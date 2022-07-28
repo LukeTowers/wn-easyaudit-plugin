@@ -8,7 +8,7 @@ use Event;
  */
 trait EventHelper
 {
-    use \October\Rain\Support\Traits\Emitter;
+    use \Winter\Storm\Support\Traits\Emitter;
 
     /**
      * Prefix to remove for local events

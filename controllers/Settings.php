@@ -22,7 +22,7 @@ class Settings extends Controller
     {
         parent::__construct();
 
-        BackendMenu::setContext('October.System', 'system', 'settings');
+        BackendMenu::setContext('Winter.System', 'system', 'settings');
         SettingsManager::setContext('LukeTowers.EasyAudit', 'settings');
     }
 

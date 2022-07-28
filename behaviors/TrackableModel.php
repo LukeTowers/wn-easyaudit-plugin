@@ -1,7 +1,8 @@
 <?php namespace LukeTowers\EasyAudit\Behaviors;
 
+use Config;
 use BackendAuth;
-use October\Rain\Database\ModelBehavior as ModelBehaviorBase;
+use Winter\Storm\Database\ModelBehavior as ModelBehaviorBase;
 
 use LukeTowers\EasyAudit\Models\Activity;
 use LukeTowers\EasyAudit\Classes\ActivityLogger;
@@ -136,13 +137,9 @@ class TrackableModel extends ModelBehaviorBase
         }
 
         // Default the source to the currently logged in backend user (if there is one)
-        $user = BackendAuth::getUser();
+        // ensuring that impersonators are logged as the true source of the activity
+        $user = BackendAuth::getRealUser();
         if ($user) {
-            // Ensure that impersonators are logged as the true source of the activity
-            if (BackendAuth::isImpersonator()) {
-                $user = BackendAuth::getImpersonator();
-            }
-
             $this->logger->by($user);
         }
 
@@ -162,8 +159,8 @@ class TrackableModel extends ModelBehaviorBase
 
         if (count($namespaced) === 1) {
             $logName = $namespaced[0];
-        } elseif (count($namespaced) === 3 && in_array($namespaced[0], ['Backend', 'Cms', 'System'])) {
-            $logName = 'October.' . $namespaced[0];
+        } elseif (count($namespaced) === 3 && in_array($namespaced[0], Config::get('cms.loadModules', ['Backend', 'Cms', 'System']))) {
+            $logName = 'Module.' . $namespaced[0];
         } else {
             $logName = $namespaced[0] . '.' . $namespaced[1];
         }
@@ -190,7 +187,7 @@ class TrackableModel extends ModelBehaviorBase
             }
 
             // Attempt to get the event that was triggered
-            // NOTE: Super dirty, pretty reliant on internal October implementation of fireEvent() method
+            // NOTE: Super dirty, pretty reliant on internal Winter implementation of fireEvent() method
             $eventName = null;
             $backtrace = debug_backtrace(false, 3);
             if (!empty($backtrace[2]['args'][0])) {

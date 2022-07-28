@@ -161,7 +161,7 @@ class ActivityLog extends FormWidgetBase
         } else {
             switch ($this->source) {
                 case 'currentUser':
-                    $source = BackendAuth::getUser();
+                    $source = BackendAuth::getRealUser();
                     break;
                 case 'formModel':
                     $source = $this->model;

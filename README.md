@@ -1,16 +1,10 @@
 # About
 
-Easily view and manage audit logs for models within your OctoberCMS projects.
+Easily view and manage audit logs for models within your Winter CMS projects.
 
 # Installation
 
-To install from the [Marketplace](https://octobercms.com/plugin/luketowers-easyaudit), click on the "Add to Project" button and then select the project you wish to add it to before updating the project to pull in the plugin.
-
-To install from the backend, go to **Settings -> Updates & Plugins -> Install Plugins** and then search for `LukeTowers.EasyAudit`.
-
-To install from [the repository](https://github.com/luketowers/oc-easyaudit-plugin), clone it into **plugins/luketowers/easyaudit** and then run `composer update` from your project root in order to pull in the dependencies.
-
-To install it with Composer, run `composer require luketowers/oc-easyaudit-plugin` from your project root.
+To install it with Composer, run `composer require luketowers/wn-easyaudit-plugin` from your project root.
 
 # Documentation
 
