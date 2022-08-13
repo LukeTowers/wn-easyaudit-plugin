@@ -1,6 +1,5 @@
 <?php namespace LukeTowers\EasyAudit\Models;
 
-use Lang;
 use Model;
 use Config;
 
