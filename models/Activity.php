@@ -345,39 +345,40 @@ class Activity extends Model
     }
 
     /**
-     * Get the source name
-     *
-     * @return string Name of the source for this activity item
+     * Get the souces's name for human consumption
      */
-    public function getSourceNameAttribute($value)
+    public function getSourceNameAttribute($value): string
     {
         if (!empty($value)) {
             return $value;
         }
 
+        $prefix = basename(str_replace('\\', '/', $this->source_type)) . ': ';
         if ($this->source) {
-            return basename(str_replace('\\', '/', get_class($this->source))) . ': ' . $this->source->name;
+            $sourceKey = $this->source->name ?: $this->source->title ?: $this->source->getKey();
         } else {
-            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown');
+            $sourceKey = $this->source_key;
         }
+
+        return $prefix . $sourceKey;
     }
 
     /**
-     * Get the subject name
-     *
-     * @return string Name of the subject of this activity item
+     * Get the subject's name for human consumption
      */
-    public function getSubjectNameAttribute($value)
+    public function getSubjectNameAttribute($value): string
     {
         if (!empty($value)) {
             return $value;
         }
 
+        $prefix = basename(str_replace('\\', '/', $this->subject_type)) . ': ';
         if ($this->subject) {
-            $prefix = basename(str_replace('\\', '/', get_class($this->subject))) . ': ';
-            return $prefix . (!empty($this->subject->name) ? $this->subject->name : $this->subject->getKey());
+            $subjectKey = $this->subject->name ?: $this->subject->title ?: $this->subject->getKey();
         } else {
-            return Lang::get('luketowers.easyaudit::lang.models.activity.unknown');
+            $subjectKey = $this->subject_id;
         }
+
+        return $prefix . $subjectKey;
     }
 }
