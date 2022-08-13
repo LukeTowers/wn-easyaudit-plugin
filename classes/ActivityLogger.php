@@ -185,7 +185,7 @@ class ActivityLogger
      * @param mixed $model The variable to check
      * @return bool The model's validatity (true = valid, false = invalid)
      */
-    protected function validateModel($model)
+    public function validateModel($model): bool
     {
         return ($model instanceof Model && $model->exists);
     }
