@@ -234,6 +234,24 @@ class Activity extends Model
     }
 
     /**
+     * Scope a query to only include activities to a given subject type.
+     *
+     * @param Builder $query
+     * @param array $subjectTypes The subject_types to filter by, in the form of ['type']
+     * @return Builder
+     */
+    public function scopeToSubjectTypes($query, ...$subjectTypes)
+    {
+        if (is_array($subjectTypes[0])) {
+            $subjectTypes = $subjectTypes[0];
+        } elseif (count($subjectTypes) === 1) {
+            $subjectTypes = [$subjectTypes];
+        }
+
+        return $query->whereIn('subject_type', $subjectTypes);
+    }
+
+    /**
      * Get only the unique values for the provided column
      *
      * @param string $column
@@ -342,6 +360,19 @@ class Activity extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * Get the available subject types
+     *
+     * @param Model|null The subject that we're filtering options for
+     * @param Model|null The source that we're filtering options for
+     * @return array $result ['type' => $activity->source_name]
+     */
+    public function getSubjectTypeOptions($subject = null, $source = null, $limit = 500)
+    {
+        // @TODO: Trim prefix off of options
+        return static::distinct('subject_type')->lists('subject_type', 'subject_type');
     }
 
     /**
