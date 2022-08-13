@@ -17,6 +17,12 @@ scopes:
         scope: fromSources
         modelClass: LukeTowers\EasyAudit\Models\Activity
         options: getSourceOptions
+    subject_type:
+        label: luketowers.easyaudit::lang.models.activity.subject
+        type: group
+        scope: toSubjectTypes
+        modelClass: LukeTowers\EasyAudit\Models\Activity
+        options: getSubjectTypeOptions
     created_at:
         label: luketowers.easyaudit::lang.controllers.activities.filters.created_at
         type: daterange
