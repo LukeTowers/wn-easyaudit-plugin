@@ -1,6 +1,5 @@
 <?php
 
-use BackendAuth;
 use LukeTowers\EasyAudit\Classes\ActivityLogger;
 
 if (!function_exists('audit')) {
@@ -20,7 +19,7 @@ if (!function_exists('audit')) {
 
         // Default the source to the currently logged in backend user (if there is one)
         // ensuring that impersonators are logged as the true source of the activity
-        $user = BackendAuth::getRealUser();
+        $user = \BackendAuth::getRealUser();
         if ($user) {
             $logger->by($user);
         }
