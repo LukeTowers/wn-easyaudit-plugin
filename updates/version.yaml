@@ -20,3 +20,4 @@
 3.0.6: 'Fixed some bugs with filtering audit logs with large numbers of records'
 3.0.7: 'Performance improvement for the System Activities dashboard widget'
 3.0.8: 'Improved support for embedding the ActivityLog form widget in nested popups'
+4.0.0: 'Dropped support for PHP < 8.0, added type hints, change tracking, unit tests, & control over the connection used.'
