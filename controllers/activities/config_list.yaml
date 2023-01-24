@@ -14,7 +14,7 @@ title: Manage Activities
 # Link URL for each record
 recordUrl: luketowers/easyaudit/activities/update/:id
 
-recordOnClick: '$.oc.activityController.clickActivityRecord(:id, this)'
+recordOnClick: '$.wn.activityController.clickActivityRecord(:id, this)'
 
 # Message to display if the list is empty
 noRecordsMessage: backend::lang.list.no_records

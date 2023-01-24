@@ -1,7 +1,6 @@
 /*
- * Scripts for the Relation controller behavior.
+ * Scripts for the Activity Log controller behavior.
  */
-
 + function ($) {
     "use strict";
 
@@ -20,5 +19,5 @@
         }
     }
 
-    $.oc.activityController = new ActivityController;
+    $.wn.activityController = new ActivityController;
 }(window.jQuery);
