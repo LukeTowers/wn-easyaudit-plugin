@@ -1,11 +1,12 @@
-<?php namespace LukeTowers\EasyAudit\Behaviors;
+<?php
 
-use Config;
+namespace LukeTowers\EasyAudit\Behaviors;
+
 use BackendAuth;
-use Winter\Storm\Database\ModelBehavior as ModelBehaviorBase;
-
-use LukeTowers\EasyAudit\Models\Activity;
+use Config;
 use LukeTowers\EasyAudit\Classes\ActivityLogger;
+use LukeTowers\EasyAudit\Models\Activity;
+use Winter\Storm\Database\ModelBehavior as ModelBehaviorBase;
 
 /**
  * Trackable model extension
@@ -24,7 +25,7 @@ use LukeTowers\EasyAudit\Classes\ActivityLogger;
  *   /**
  *    * @var array The model events that are to be tracked as activities ['event', 'event'] || ['event' => [name => 'name', description => 'description']]
  *    * /
- *   public $trackableEvents = ['model.afterSave', 'model.beforeCreate'];
+ *   public $trackableEvents = ['model.afterSave', 'model.afterCreate', 'model.afterDelete'];
  *
  *   /**
  *    * @var array The custom event names to override the default event names within the activity entry
@@ -38,19 +39,25 @@ use LukeTowers\EasyAudit\Classes\ActivityLogger;
  *   public $trackableEventDescriptions = ['model.beforeCreate' => 'The model creation process has been started', 'model.afterCreate' => 'The model was created'];
  *
  *   /**
- *    * @var bool Disable the IP address logging on this model (default from the luketowers.easyaudit.logIpAddress configuration value negated)
+ *    * @var bool Manually control the IP address logging on this model (default from the luketowers.easyaudit.logIpAddress config setting)
  *    * /
- *   public $trackableDisableIpLogging = true
+ *   public $trackableLogIpAddress = true
  *
  *   /**
- *    * @var bool Disable the User agent logging on this model (default from the luketowers.easyaudit.logUserAgent configuration value negated)
+ *    * @var bool Manually control the User agent logging on this model (default from the luketowers.easyaudit.logUserAgent config setting)
  *    * /
- *   public $trackableDisableUserAgentLogging = true
+ *   public $trackableLogUserAgent = true
  *
  *   /**
- *    * @var bool Disable the change tracking on this model (default from the luketowers.easyaudit.trackChanges configuration value negated)
+ *    * @var bool Manually control the change tracking on this model (default from the luketowers.easyaudit.trackChanges config setting)
  *    * /
- *   public $trackableDisableChangeTracking = true
+ *   public $trackableTrackChanges = true
+ *
+ *   /**
+ *    * @var bool Manually control if the activities field gets automatically injected into backend forms
+ *    * for this model (default from the luketowers.easyaudit.autoInjectActvitiesFormWidget config setting)
+ *    * /
+ *   public $trackableInjectActvitiesFormWidget = true
  *
  * @package luketowers/oc-easyaudit-plugin
  * @author Luke Towers
@@ -83,6 +90,24 @@ class TrackableModel extends ModelBehaviorBase
         // Prevent duplicate activities from being logged on the same request
         if (empty($model->trackableAllowDuplicates)) {
             $this->logger->requestActivityCache(true);
+        }
+
+        // Setup the default events to be tracked
+        if (!$model->propertyExists('trackableEvents')) {
+            $model->addDynamicProperty('trackableEvents', [
+                'model.afterCreate' => [
+                    'name' => 'created',
+                    'description' => 'luketowers.easyaudit::lang.models.activity.trackableEvents.model.afterCreate',
+                ],
+                'model.afterUpdate' => [
+                    'name' => 'updated',
+                    'description' => 'luketowers.easyaudit::lang.models.activity.trackableEvents.model.afterUpdate',
+                ],
+                'model.afterDelete' => [
+                    'name' => 'archived',
+                    'description' => 'luketowers.easyaudit::lang.models.activity.trackableEvents.model.afterDelete',
+                ],
+            ]);
         }
 
         // Ensure that the logger is setup for every event it can handle

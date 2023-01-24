@@ -8,7 +8,7 @@ To install it with Composer, run `composer require luketowers/wn-easyaudit-plugi
 
 # Documentation
 
-To get started using this plugin just add a few properties to the models that you wish to track:
+To get started using this plugin just add the `TrackableModel` Behavior to any models that you wish to track:
 
 ```php
 class MyModel extends Model
@@ -17,19 +17,16 @@ class MyModel extends Model
      * @var array Behaviors implemented by this model class
      */
     public $implement = ['@LukeTowers.EasyAudit.Behaviors.TrackableModel'];
-
-    /**
-     * @var array The model events that are to be tracked as activities
-     */
-    public $trackableEvents = [
-        'model.afterCreate' => ['name' => 'created', 'description' => 'The record was created'],
-        'model.afterUpdate' => ['name' => 'updated', 'description' => 'The record was updated'],
-        'model.afterDelete' => ['name' => 'archived', 'description' => 'The record was archived'],
-    ];
 }
 ```
 
 Once you've added the `TrackableModel` behavior to a model, any local events fired on the model that have been set up in `$trackableEvents` will be automatically listened to and an audit record will be generated for each event.
+
+By default, the `TrackableModel` behavior will listen to the following events:
+
+- `model.afterCreate`
+- `model.afterUpdate`
+- `model.afterDelete`
 
 In addition to the properties above, you can also add the following properties to model classes to configure the audit logging behavior:
 
@@ -39,19 +36,34 @@ class MyModel extends Model
     // ...
 
     /**
-     * @var bool Flag to allow identical activities being logged on the same request. Defaults to false
+     * @var array The model events that are to be tracked as activities
      */
-    protected $trackableAllowDuplicates = true;
+    public $trackableEvents = [
+        'model.afterCreate' => ['name' => 'created', 'description' => 'The record was created'],
+        'model.afterUpdate' => ['name' => 'updated', 'description' => 'The record was updated'],
+        'model.afterDelete' => ['name' => 'archived', 'description' => 'The record was archived'],
+    ];
 
     /**
-     * @var bool Disable the IP address logging on this model (default from the luketowers.easyaudit.logIpAddress configuration value negated)
+     * @var bool Manually control the IP address logging on this model (default from the luketowers.easyaudit.logIpAddress config setting)
      */
-    public $trackableDisableIpLogging = true;
+    public $trackableLogIpAddress = true;
 
     /**
-     * @var bool Disable the User agent logging on this model (default from the luketowers.easyaudit.logUserAgent configuration value negated)
+     * @var bool Manually control the User agent logging on this model (default from the luketowers.easyaudit.logUserAgent config setting)
      */
-    public $trackableDisableUserAgentLogging = true;
+    public $trackableLogUserAgent = true;
+
+    /**
+     * @var bool Manually control the change tracking on this model (default from the luketowers.easyaudit.trackChanges config setting)
+     */
+    public $trackableTrackChanges = true;
+
+    /**
+     * @var bool Manually control if the activities field gets automatically injected into backend forms
+     * for this model (default from the luketowers.easyaudit.autoInjectActvitiesFormWidget config setting)
+     */
+    public $trackableInjectActvitiesFormWidget = true;
 }
 ```
 

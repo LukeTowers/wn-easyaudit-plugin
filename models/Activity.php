@@ -1,7 +1,10 @@
-<?php namespace LukeTowers\EasyAudit\Models;
+<?php
 
-use Model;
+namespace LukeTowers\EasyAudit\Models;
+
 use Config;
+use Lang;
+use Model;
 
 /**
  * Activity Model
@@ -75,59 +78,44 @@ class Activity extends Model
         }
 
         if ($this->canTrackChanges()) {
-            // @TODO: Implement this
+            $changes = $this->getSubjectChanges();
+            if (!empty($changes)) {
+                $this->properties = array_merge($this->properties ?? [], ['changes' => $changes]);
+            }
         }
     }
 
     /**
      * Check to see if the IP address can be logged
-     *
-     * @return bool
      */
-    public function canLogIpAddress()
+    public function canLogIpAddress(): bool
     {
-        $can = false;
-        if (empty($this->subject->trackableDisableIpLogging)) {
-            $can = Config::get('luketowers.easyaudit.logIpAddress', true);
-        } else {
-            $can = $this->subject->trackableDisableIpLogging;
-        }
-
-        return (bool) $can;
+        return (bool) (
+            $this->subject?->trackableLogIpAddress
+            ?? Config::get('luketowers.easyaudit::logIpAddress', true)
+        );
     }
 
     /**
      * Check to see if the user agent can be logged
-     *
-     * @return bool
      */
-    public function canLogUserAgent()
+    public function canLogUserAgent(): bool
     {
-        $can = false;
-        if (empty($this->subject->trackableDisableUserAgentLogging)) {
-            $can = Config::get('luketowers.easyaudit.logUserAgent', true);
-        } else {
-            $can = $this->subject->trackableDisableUserAgentLogging;
-        }
-
-        return (bool) $can;
+        return (bool) (
+            $this->subject?->trackableLogUserAgent
+            ?? Config::get('luketowers.easyaudit::logUserAgent', true)
+        );
     }
 
     /**
      * Check to see if the changed model attributes can be tracked
-     *
-     * @return bool
      */
-    public function canTrackChanges()
+    public function canTrackChanges(): bool
     {
-        $can = false;
-        if (empty($this->subject->trackableDisableChangeTracking)) {
-            $can = Config::get('luketowers.easyaudit.changeTracking', true);
-        } else {
-            $can = $this->subject->trackableDisableChangeTracking;
-        }
-
-        return (bool) $can;
+        return (bool) (
+            $this->subject?->trackableTrackChanges
+            ?? Config::get('luketowers.easyaudit::trackChanges', true)
+        );
     }
 
     /**
@@ -370,8 +358,28 @@ class Activity extends Model
      */
     public function getSubjectTypeOptions($subject = null, $source = null, $limit = 500)
     {
-        // @TODO: Trim prefix off of options
-        return static::distinct('subject_type')->lists('subject_type', 'subject_type');
+        $options = [];
+        $subjectTypes = static::distinct('subject_type')->lists('subject_type');
+
+        foreach ($subjectTypes as $class) {
+            if (empty($class)) {
+                continue;
+            }
+            $parts = explode('\\', $class);
+            if (count($parts) === 3) {
+                $options[$class] = $parts[0] . ' ' . $parts[2];
+            } elseif (count($parts) === 4) {
+                // This is a plugin
+                $pluginCode = $parts[0] . '.' . $parts[1];
+                $plugin = \System\Classes\PluginManager::instance()->findByIdentifier($pluginCode);
+                if ($plugin) {
+                    $pluginCode = Lang::get($plugin->pluginDetails()['name'] ?? $pluginCode);
+                }
+                $options[$class] = $pluginCode . ': ' . $parts[3];
+            }
+        }
+
+        return $options;
     }
 
     /**
@@ -402,6 +410,15 @@ class Activity extends Model
             return $value;
         }
 
+        // Return a nice subject for media.* events
+        if ($this->log === 'System.Media') {
+            return $this->properties['path'] ?? $this->properties['changes']['path']['from'] ?? '';
+        }
+
+        if (is_null($this->subject)) {
+            return '';
+        }
+
         $prefix = basename(str_replace('\\', '/', $this->subject_type)) . ': ';
         if ($this->subject) {
             $subjectKey = $this->subject->name ?: $this->subject->title ?: $this->subject->getKey();
@@ -410,5 +427,55 @@ class Activity extends Model
         }
 
         return $prefix . $subjectKey;
+    }
+
+    /**
+     * Accessor for $activity->description
+     */
+    public function getDescriptionAttribute($value): string
+    {
+        if (empty($value)) {
+            $value = '';
+        }
+
+        // @TODO: Support using attributes from the event and the subject's / source's attributes
+        // array processed by array_dot inside of the localized message template
+        return Lang::get($value);
+    }
+
+    /**
+     * Get the changes that have ocurred to the subject
+     */
+    public function getSubjectChanges(): array
+    {
+        if (empty($this->subject)) {
+            return [];
+        }
+
+        $ignoredAttributes = [
+            'updated_at',
+        ];
+
+        $changes = [];
+        foreach ($this->subject->getChanges() as $key => $change) {
+            if (in_array($key, $ignoredAttributes)) {
+                continue;
+            }
+
+            $from = $this->subject->getOriginal($key);
+            $to = $change;
+
+            // Ignore null => '' changes
+            if (is_null($from) && $to === '') {
+                continue;
+            }
+
+            $changes[$key] = [
+                'from' => $from,
+                'to' => $to,
+            ];
+        }
+
+        return $changes;
     }
 }

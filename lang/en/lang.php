@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'plugin' => [
         'name'        => 'EasyAudit',
         'description' => 'View and manage audit logs for models within your project',
@@ -8,6 +10,7 @@
         'activity' => [
             'label'        => 'Activity',
             'label_plural' => 'Activities',
+            'audit_log'    => 'Audit Log',
             'log'          => 'Log',
             'event'        => 'Action',
             'description'  => 'Description',
@@ -16,14 +19,25 @@
             'source_user'  => 'User',
             'created_at'   => 'Activity Date',
             'ip_address'   => 'IP Address',
+            'changes'      => 'Changes',
+            'no_changes'   => 'No changes captured by event',
+            'change_from'  => 'From',
+            'change_to'    => 'To',
             'user_agent'   => 'User Agent',
             'tab_request'  => 'Request',
             'unknown'      => 'Unknown',
+            'trackableEvents' => [
+                'model' => [
+                    'afterCreate' => 'The record was created',
+                    'afterUpdate' => 'The record was updated',
+                    'afterDelete' => 'The record was deleted',
+                ],
+            ],
         ],
     ],
 
     'permissions' => [
-        'manage_settings' => 'Manage EasyAudit Settings',
+        'clear_logs' => 'Clear the Activity Log',
         'activities'      => [
             'view_all'    => 'View all activities',
             'view_own'    => 'View own activities',

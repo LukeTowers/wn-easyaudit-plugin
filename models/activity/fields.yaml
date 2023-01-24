@@ -21,6 +21,12 @@ fields:
 
 tabs:
     fields:
+        properties[changes]:
+            tab: luketowers.easyaudit::lang.models.activity.changes
+            label: ""
+            type: partial
+            path: $/luketowers/easyaudit/models/activity/field.diff.php
+            span: full
         ip_address:
             tab: luketowers.easyaudit::lang.models.activity.tab_request
             label: luketowers.easyaudit::lang.models.activity.ip_address

@@ -1,5 +1,8 @@
-<?php namespace LukeTowers\EasyAudit\Traits;
+<?php
 
+namespace LukeTowers\EasyAudit\Traits;
+
+use Backend\Widgets\Form;
 use LukeTowers\EasyAudit\Models\Activity;
 
 trait CanViewActivityRecord
@@ -24,10 +27,8 @@ trait CanViewActivityRecord
 
     /**
      * Get the Form widget used for the activity record popup
-     *
-     * @return Backend\Widgets\Form The intialized Form widget
      */
-    protected function getActivityRecordWidget()
+    protected function getActivityRecordWidget(): Form
     {
         if ($this->activityRecordWidget) {
             return $this->activityRecordWidget;
@@ -50,10 +51,8 @@ trait CanViewActivityRecord
 
     /**
      * Get the currently active activity record
-     *
-     * @return Activity
      */
-    protected function getCurrentActivity()
+    protected function getCurrentActivity(): Activity
     {
         $activity = Activity::find(post('luketowers-easyaudit-recordId'));
 
@@ -66,11 +65,9 @@ trait CanViewActivityRecord
 
     /**
      * AJAX handler to view a specific activity item's details
-     *
-     * @return string
      */
-    public function onViewLogItemDetails()
+    public function onViewLogItemDetails(): string
     {
-        return $this->makePartial('$/luketowers/easyaudit/partials/popup.activitydetails.htm', ['form' => $this->getActivityRecordWidget()], false);
+        return $this->makePartial('$/luketowers/easyaudit/partials/popup.activitydetails.php', ['form' => $this->getActivityRecordWidget()], false);
     }
 }
