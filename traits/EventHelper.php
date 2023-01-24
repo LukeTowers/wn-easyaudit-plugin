@@ -1,4 +1,6 @@
-<?php namespace LukeTowers\EasyAudit\Traits;
+<?php
+
+namespace LukeTowers\EasyAudit\Traits;
 
 use Event;
 

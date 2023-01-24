@@ -1,7 +1,12 @@
-<?php namespace LukeTowers\EasyAudit;
+<?php
+
+namespace LukeTowers\EasyAudit;
 
 use Backend;
 use Backend\Models\User;
+use Config;
+use Event;
+use LukeTowers\EasyAudit\Behaviors\TrackableModel;
 use System\Classes\PluginBase;
 
 /**
@@ -30,32 +35,34 @@ use System\Classes\PluginBase;
 class Plugin extends PluginBase
 {
     /**
-     * Returns information about this plugin.
-     *
-     * @return array
+     * @var bool Plugin requires elevated permissions in order to continue logging changes
+     * in privileged areas of the application
      */
-    public function pluginDetails()
+    public $elevated = true;
+
+    /**
+     * Returns information about this plugin.
+     */
+    public function pluginDetails(): array
     {
         return [
             'name'        => 'luketowers.easyaudit::lang.plugin.name',
             'description' => 'luketowers.easyaudit::lang.plugin.description',
-            'author'      => 'LukeTowers',
+            'author'      => 'Luke Towers',
             'icon'        => 'icon-list-alt',
-            'homepage'    => 'https://github.com/LukeTowers/oc-easyaudit-plugin',
+            'homepage'    => 'https://github.com/LukeTowers/wn-easyaudit-plugin',
         ];
     }
 
     /**
-     * Registers any back-end permissions used by this plugin.
-     *
-     * @return array
+     * Registers any backend permissions used by this plugin.
      */
-    public function registerPermissions()
+    public function registerPermissions(): array
     {
         return [
-            'luketowers.easyaudit.manage_settings' => [
+            'luketowers.easyaudit.clear_logs' => [
                 'tab'   => 'luketowers.easyaudit::lang.plugin.name',
-                'label' => 'luketowers.easyaudit::lang.permissions.manage_settings'
+                'label' => 'luketowers.easyaudit::lang.permissions.clear_logs'
             ],
             'luketowers.easyaudit.activities.view_all' => [
                 'tab'   => 'luketowers.easyaudit::lang.plugin.name',
@@ -70,10 +77,8 @@ class Plugin extends PluginBase
 
     /**
      * Registers the settings used by this plugin
-     *
-     * @return array
      */
-    public function registerSettings()
+    public function registerSettings(): array
     {
         return [
             'logs' => [
@@ -92,32 +97,28 @@ class Plugin extends PluginBase
 
     /**
      * Register the plugin's form widgets
-     *
-     * @return array
      */
-    public function registerFormWidgets()
+    public function registerFormWidgets(): array
     {
         return [
-            'LukeTowers\EasyAudit\FormWidgets\ActivityLog' => 'activitylog',
+            \LukeTowers\EasyAudit\FormWidgets\ActivityLog::class => 'activitylog',
         ];
     }
 
     /**
      * Register the plugin's report widgets
-     *
-     * @return array
      */
-    public function registerReportWidgets()
+    public function registerReportWidgets(): array
     {
         return [
-            'LukeTowers\EasyAudit\ReportWidgets\MyActivities' => [
+            \LukeTowers\EasyAudit\ReportWidgets\MyActivities::class => [
                 'label'       => 'luketowers.easyaudit::lang.widgets.myactivities.label',
                 'context'     => 'dashboard',
                 'permissions' => [
                     'luketowers.easyaudit.activities.view_own'
                 ],
             ],
-            'LukeTowers\EasyAudit\ReportWidgets\SystemActivities' => [
+            \LukeTowers\EasyAudit\ReportWidgets\SystemActivities::class => [
                 'label'       => 'luketowers.easyaudit::lang.widgets.systemactivities.label',
                 'context'     => 'dashboard',
                 'permissions' => [
@@ -129,10 +130,128 @@ class Plugin extends PluginBase
 
     /**
      * Runs when the plugin is booted
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
+    {
+        $this->registerMediaLibraryTracking();
+        $this->registerModelTracking();
+        $this->extendBackendForms();
+        $this->extendBackendUserModel();
+    }
+
+    /**
+     * Setup the media library tracking
+     */
+    protected function registerMediaLibraryTracking(): void
+    {
+        Event::listen('media.*', function ($eventName, $params) {
+            $action = '';
+            switch ($eventName) {
+                case 'media.file.delete':
+                case 'media.folder.delete':
+                    $action = 'deleted';
+                    break;
+                case 'media.file.move':
+                case 'media.folder.move':
+                    $action = 'moved';
+                    break;
+                case 'media.file.rename':
+                case 'media.folder.rename':
+                    $action = 'renamed';
+                    break;
+                case 'media.file.upload':
+                case 'media.file.streamedUpload':
+                    $action = 'uploaded';
+                    break;
+                case 'media.folder.create':
+                    $action = 'created';
+                    break;
+            }
+
+            $properties = [];
+            if (count($params) === 3 && is_string($params[2])) {
+                $description = $params[1] . " was $action to " . $params[2];
+                $properties = [
+                    'changes' => [
+                        'path' => [
+                            'from' => $params[1],
+                            'to' => $params[2],
+                        ],
+                    ],
+                ];
+            } else {
+                $description = $params[1] . " was $action";
+                $properties = ['path' => $params[1]];
+            }
+
+            audit()
+                ->inLog('System.Media')
+                ->event($eventName)
+                ->description($description)
+                ->properties($properties)
+                ->log();
+        });
+    }
+
+    /**
+     * Setup the model tracking
+     */
+    protected function registerModelTracking(): void
+    {
+        $modelsToTrack = Config::get('luketowers.easyaudit::modelsToTrack', []);
+        foreach ($modelsToTrack as $modelClass) {
+            $modelClass::extend(function ($model) {
+                $model->extendClassWith(TrackableModel::class);
+            });
+        }
+    }
+
+    /**
+     * Extend the backend forms to add the activity log widget to models
+     * implementing the TrackableModel behavior
+     */
+    protected function extendBackendForms(): void
+    {
+        if ($this->app->runningInBackend()) {
+            // Add the audit log to models implementing trackable model
+            Event::listen('backend.form.extendFieldsBefore', function (\Backend\Widgets\Form $widget) {
+                if (
+                    $widget->isNested
+                    || (
+                        method_exists($widget->model, 'isClassExtendedWith')
+                        && !$widget->model->isClassExtendedWith(TrackableModel::class)
+                    )
+                    || !(
+                        $widget->model->trackableInjectActvitiesFormWidget
+                        ?? Config::get('luketowers.easyaudit.autoInjectActvitiesFormWidget', true)
+                    )
+                ) {
+                    return;
+                }
+
+                $tabsFields = $widget->tabs['fields'] ?? [];
+                $secondaryTabsFields = $widget->secondaryTabs['fields'] ?? [];
+                $location = (count($tabsFields) > count($secondaryTabsFields)) ? 'tabs' : 'secondaryTabs';
+
+                $widget->{$location}['fields'] = array_merge(${$location . 'Fields'}, [
+                    'activities' => [
+                        'tab' => 'luketowers.easyaudit::lang.models.activity.audit_log',
+                        'context' => ['update', 'preview'],
+                        'type' => 'activitylog',
+                        'span' => 'full',
+                        'cssClass' => 'container'
+                    ],
+                ]);
+                $widget->{$location}['icons']['luketowers.easyaudit::lang.models.activity.audit_log'] = 'icon-eye';
+            });
+        }
+    }
+
+    /**
+     * Extend the backend user model to add the $user->name accessor for
+     * use in the activity log
+     */
+    protected function extendBackendUserModel(): void
     {
         User::extend(function ($model) {
             if (empty($model->name)) {
