@@ -14,7 +14,7 @@
                 <?php if (count($records)) : ?>
                     <?php $backendHelper = new \Backend\Helpers\Backend(); ?>
                     <?php foreach ($records as $record) : ?>
-                        <tr class="rowlink" onclick="$.oc.activityController.clickActivityRecord(<?= $record->id; ?>, this, '<?= $this->getEventHandler('onViewLogItemDetails'); ?>')">
+                        <tr class="rowlink" onclick="$.wn.activityController.clickActivityRecord(<?= $record->id; ?>, this, '<?= $this->getEventHandler('onViewLogItemDetails'); ?>')">
                             <td><?= $record->event; ?></td>
                             <td><?= $record->subject_name; ?></td>
                             <td><?= $backendHelper->dateTime($record->created_at); ?></td>

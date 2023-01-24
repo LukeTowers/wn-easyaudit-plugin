@@ -4,10 +4,10 @@
     data-alias="<?= $this->alias; ?>"
 >
     <div class="row">
-        <?php if ($toolbar): ?>
+        <?php if ($toolbar) : ?>
             <?= $toolbar->render() ?>
         <?php endif ?>
-        <?php if ($filter): ?>
+        <?php if ($filter) : ?>
             <?= $filter->render() ?>
         <?php endif ?>
     </div>

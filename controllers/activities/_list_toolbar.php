@@ -1,4 +1,4 @@
-<?php if (\BackendAuth::getUser()->hasAccess('luketowers.easyaudit.manage_settings')) : ?>
+<?php if (\BackendAuth::getUser()->hasAccess('luketowers.easyaudit.activities.view_all')) : ?>
     <button
         class="btn btn-danger"
         data-request="onEmptyLog"

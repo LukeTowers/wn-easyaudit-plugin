@@ -11,7 +11,7 @@ activities:
             source:
                 label: luketowers.easyaudit::lang.models.activity.source_user
                 type: partial
-                path: $/luketowers/easyaudit/partials/field.source_user.htm
+                path: $/luketowers/easyaudit/partials/field.source_user.php
                 span: left
 
             event:
@@ -33,7 +33,7 @@ activities:
             source_id:
                 label: luketowers.easyaudit::lang.models.activity.source_user
                 type: partial
-                path: $/luketowers/easyaudit/partials/column.source_user.htm
+                path: $/luketowers/easyaudit/partials/column.source_user.php
 
             event:
                 label: luketowers.easyaudit::lang.models.activity.event
