@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -10,6 +12,7 @@
     | disable that behaviour.
     |
     */
+
     'logIpAddress' => true,
 
     /*
@@ -22,6 +25,7 @@
     | disable that behaviour.
     |
     */
+
     'logUserAgent' => true,
 
     /*

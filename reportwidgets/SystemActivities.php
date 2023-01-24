@@ -1,4 +1,6 @@
-<?php namespace LukeTowers\EasyAudit\ReportWidgets;
+<?php
+
+namespace LukeTowers\EasyAudit\ReportWidgets;
 
 use Backend\Classes\ReportWidgetBase;
 use LukeTowers\EasyAudit\Models\Activity;

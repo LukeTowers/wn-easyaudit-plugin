@@ -1,9 +1,11 @@
-<?php namespace LukeTowers\EasyAudit\FormWidgets;
+<?php
 
-use Model;
-use BackendAuth;
+namespace LukeTowers\EasyAudit\FormWidgets;
+
 use Backend\Classes\FormField;
 use Backend\Classes\FormWidgetBase;
+use BackendAuth;
+use Model;
 
 /**
  * ActivityLog Form Widget

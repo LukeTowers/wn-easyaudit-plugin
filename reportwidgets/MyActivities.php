@@ -1,7 +1,9 @@
-<?php namespace LukeTowers\EasyAudit\ReportWidgets;
+<?php
 
-use BackendAuth;
+namespace LukeTowers\EasyAudit\ReportWidgets;
+
 use Backend\Classes\ReportWidgetBase;
+use BackendAuth;
 use LukeTowers\EasyAudit\Models\Activity;
 
 class MyActivities extends ReportWidgetBase

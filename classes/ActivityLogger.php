@@ -1,10 +1,11 @@
-<?php namespace LukeTowers\EasyAudit\Classes;
+<?php
+
+namespace LukeTowers\EasyAudit\Classes;
 
 use Config;
-use ApplicationException;
 use Illuminate\Database\Eloquent\Model;
-
 use LukeTowers\EasyAudit\Models\Activity as ActivityModel;
+use SystemException;
 
 /**
  * Activity Logger service class to log activities (events) on models
@@ -13,12 +14,21 @@ use LukeTowers\EasyAudit\Models\Activity as ActivityModel;
  * Example (all in one):
  *
  *    $activity = new ActivityLogger();
- *    $activity->log('updated', 'MyModel updated', $myModel, BackendAuth::getUser(), ['maintenanceMode' => true], 'MyVendor.MyPlugin');
+ *    $activity->log(
+ *      'updated',
+ *      'MyModel updated',
+ *      $myModel,
+ *      BackendAuth::getUser(),
+ *      ['maintenanceMode' => true],
+ *      'MyVendor.MyPlugin',
+ *      'mysql'
+ *   );
  *
  * Or (chained):
  *
  *    $activity = new ActivityLogger();
- *    $activity->inLog('MyVendor.MyPlugin')
+ *    $activity->onConnection('mysql')
+ *              ->inLog('MyVendor.MyPlugin')
  *              ->for($myModel)
  *              ->by(BackendAuth::getUser())
  *              ->description('MyModel updated')
@@ -34,35 +44,48 @@ class ActivityLogger
 
     const EVENT_PREFIX = 'luketowers.easyaudit.logger';
 
-    /**
-     * @var string The name of the event
-     */
-    protected $event;
+    //
+    // Properties
+    //
 
     /**
-     * @var string The human-readable description of the event
+     * The name of the DB connection this event should be logged to
      */
-    protected $description;
+    protected ?string $connection = null;
 
     /**
-     * @var Model The subject (model the event is being performed on) of the event to be logged
+     * The name of the log this event belongs to
      */
-    protected $subject;
+    protected ?string $logName = null;
 
     /**
-     * @var Model The source (model the event is being caused by) of the event to be logged
+     * The name of the event
      */
-    protected $source;
+    protected ?string $event = null;
 
     /**
-     * @var array Additional properties to store with the log entry
+     * The human-readable description of the event
      */
-    protected $properties;
+    protected ?string $description = null;
 
     /**
-     * @var string The name of the log this event belongs to
+     * The subject (model the event is being performed on) of the event to be logged
      */
-    protected $logName;
+    protected ?Model $subject = null;
+
+    /**
+     * The source (model the event is being caused by) of the event to be logged
+     */
+    protected ?Model $source = null;
+
+    /**
+     * Additional properties to store with the log entry
+     */
+    protected array $properties = [];
+
+    //
+    // Internal Flags
+    //
 
     /**
      * @var bool Flag for whether this logger instance has been prepared for logging
@@ -84,19 +107,21 @@ class ActivityLogger
         }
 
         // Deduplicate activities on the same request cycle
-        if ($this->activityCacheEnabled) {
-            $cacheKey = 'luketowers.easyaudit.cachedRequestActivities';
-            $this->bindEvent('afterLog', function () use ($cacheKey) {
-                $activitiesLogged = Config::get($cacheKey, []);
-                $activitiesLogged[] = $this->getHash();
-                Config::set($cacheKey, $activitiesLogged);
-            });
-            $this->bindEvent('log', function () use ($cacheKey) {
-                if (in_array($this->getHash(), Config::get($cacheKey, []))) {
-                    return true;
-                }
-            });
-        }
+        // @TODO: Somewhat unreliable, improve
+        $cacheKey = 'luketowers.easyaudit.cachedRequestActivities';
+        $this->bindEvent('afterLog', function () use ($cacheKey) {
+            $activitiesLogged = Config::get($cacheKey, []);
+            $activitiesLogged[] = $this->getHash();
+            Config::set($cacheKey, $activitiesLogged);
+        });
+        $this->bindEvent('log', function () use ($cacheKey) {
+            if (
+                $this->activityCacheEnabled
+                && in_array($this->getHash(), Config::get($cacheKey, []))
+            ) {
+                return true;
+            }
+        });
 
         $this->loggerPrepared = true;
     }
@@ -104,17 +129,30 @@ class ActivityLogger
     /**
      * Log the event // NOTE: Probably horribly messy and inefficient, mvp it first
      *
-     * @param string $event The name of the event to log
+     * @param string|array $event The name of the event to log, if this is an array then it
+     * must be the only argument provided and it must be an array keyed by the other available parameters
      * @param string $description The human-readable description of the event to log
      * @param Model $subject The model the event is being performed on
      * @param Model $source The model the event is being performed by
      * @param array $properties The additional properties to store with the log entry
      * @param string $logName The log to log this activity to
+     * @param string $connection The DB connection to log this activity in
      */
-    public function log($event = '', $description = '', $subject = null, $source = null, $properties = array(), $logName = null)
-    {
+    public function log(
+        string|array $event = '',
+        string $description = '',
+        Model $subject = null,
+        Model $source = null,
+        array $properties = [],
+        string $logName = null,
+        string $connection = null
+    ) : void {
         // Prepare the logger
         $this->prepareLogger();
+
+        if (is_array($event)) {
+            extract($event);
+        }
 
         // Populate the event information in this instance
         if (!empty($event)) {
@@ -122,7 +160,7 @@ class ActivityLogger
         }
 
         if (empty($this->event)) {
-            throw new ApplicationException("The event name for an activity log entry cannot be empty.");
+            throw new SystemException("The event name for an activity log entry cannot be empty.");
         }
 
         if (!empty($description)) {
@@ -145,6 +183,9 @@ class ActivityLogger
             $this->inLog($logName);
         }
 
+        if (!empty($connection)) {
+            $this->onConnection($connection);
+        }
 
         // Create and populate the activity entry to be stored in the database
         $activity = new ActivityModel([
@@ -163,6 +204,10 @@ class ActivityLogger
 
         if (!empty($this->logName)) {
             $activity->log = $this->logName;
+        }
+
+        if ($this->connection) {
+            $activity->setConnection($this->connection);
         }
 
         // Provide opportunity to prevent this activity from being logged
@@ -193,10 +238,8 @@ class ActivityLogger
     /**
      * Clear this instance of it's data
      * NOTE: Probably only necessitated by the design choice to be able to chain method calls; tbd whether this stays in
-     *
-     * @return ActivityLogger $this
      */
-    public function clear()
+    public function clear(): static
     {
         // Trigger a before clear event
         $originalSubject = null;
@@ -210,8 +253,9 @@ class ActivityLogger
         $this->description = null;
         $this->subject = null;
         $this->source = null;
-        $this->properties = null;
+        $this->properties = [];
         $this->logName = null;
+        $this->connection = null;
 
         // Trigger an after clear event
         if ($originalSubject) {
@@ -223,11 +267,8 @@ class ActivityLogger
 
     /**
      * Sets the event name for the event to be logged
-     *
-     * @param string $event The name of the event being logged
-     * @return ActivityLogger $this
      */
-    public function event(string $event)
+    public function event(string $event): static
     {
         $this->event = $event;
         return $this;
@@ -235,11 +276,8 @@ class ActivityLogger
 
     /**
      * Sets the description for the event to be logged
-     *
-     * @param string $description The human-readable description of the event being logged
-     * @return ActivityLogger $this
      */
-    public function description(string $description)
+    public function description(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -247,11 +285,8 @@ class ActivityLogger
 
     /**
      * Sets the subject of the event being logged
-     *
-     * @param Model The subject (model the event is being performed on) of the event to be logged
-     * @return ActivityLogger $this
      */
-    public function for(Model $subject)
+    public function for(Model $subject): static
     {
         $this->subject = $subject;
         return $this;
@@ -259,23 +294,17 @@ class ActivityLogger
 
     /**
      * Sets the source of the event being logged
-     *
-     * @param Model The source (model the event is being caused by) of the event to be logged
-     * @return ActivityLogger $this
      */
-    public function by(Model $source)
+    public function by(Model $source): static
     {
         $this->source = $source;
         return $this;
     }
 
     /**
-     * Sets the description for the event to be logged
-     *
-     * @param array Additional properties to store with the log entry
-     * @return ActivityLogger $this
+     * Sets the additional properties to be stored with the event being logged
      */
-    public function properties(array $properties)
+    public function properties(array $properties): static
     {
         $this->properties = $properties;
         return $this;
@@ -283,23 +312,26 @@ class ActivityLogger
 
     /**
      * Sets the log name for the event to be logged
-     *
-     * @param string $logName The log to log this activity to
-     * @return ActivityLogger $this
      */
-    public function inLog(string $logName)
+    public function inLog(string $logName): static
     {
         $this->logName = $logName;
         return $this;
     }
 
     /**
-     * Check if the per-request de-duplication cache is enabled or change the state of it
-     *
-     * @param bool $enable Enable or disable the per-request de-duplication cache
-     * @return bool
+     * Sets the name of the DB connection to log the event in
      */
-    public function requestActivityCache($enable = null)
+    public function onConnection(string $connection): static
+    {
+        $this->connection = $connection;
+        return $this;
+    }
+
+    /**
+     * Check if the per-request de-duplication cache is enabled or change the state of it
+     */
+    public function requestActivityCache(bool $enable = null): bool
     {
         if ($enable !== null) {
             $this->activityCacheEnabled = $enable;
@@ -310,10 +342,8 @@ class ActivityLogger
 
     /**
      * Calculate a hash key for the given logger instance
-     *
-     * @return string
      */
-    public function getHash()
+    public function getHash(): string
     {
         $instance = [
             'event'         => $this->event,
@@ -324,8 +354,9 @@ class ActivityLogger
             'source_key'    => $this->source ? $this->source->getKey() : null,
             'properties'    => $this->properties,
             'logName'       => $this->logName,
+            'connection'    => $this->connection,
         ];
 
-        return md5(serialize($instance));
+        return md5(json_encode($instance));
     }
 }

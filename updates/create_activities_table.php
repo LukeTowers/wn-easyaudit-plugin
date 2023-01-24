@@ -1,15 +1,15 @@
-<?php namespace LukeTowers\EasyAudit\Updates;
+<?php
+
+namespace LukeTowers\EasyAudit\Updates;
 
 use Schema;
 use Winter\Storm\Database\Updates\Migration;
 
 class CreateActivitiesTable extends Migration
 {
-
     public function up()
     {
-        Schema::create('luketowers_easyaudit_activities', function($table)
-        {
+        Schema::create('luketowers_easyaudit_activities', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('log')->default('default')->index();
@@ -31,5 +31,4 @@ class CreateActivitiesTable extends Migration
     {
         Schema::dropIfExists('luketowers_easyaudit_activities');
     }
-
 }
