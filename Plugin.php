@@ -199,8 +199,16 @@ class Plugin extends PluginBase
     protected function registerModelTracking(): void
     {
         $modelsToTrack = Config::get('luketowers.easyaudit::modelsToTrack', []);
-        foreach ($modelsToTrack as $modelClass) {
-            $modelClass::extend(function ($model) {
+        foreach ($modelsToTrack as $class => $config) {
+            if (is_array($config)) {
+                $modelClass = $class;
+            } else {
+                $modelClass = $config;
+                $config = [];
+            }
+
+            $modelClass::extend(function ($model) use ($config) {
+                $model->addDynamicProperty('trackableIgnoredAttributes', $config['ignoredAttributes'] ?? []);
                 $model->extendClassWith(TrackableModel::class);
             });
         }

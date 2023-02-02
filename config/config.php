@@ -68,6 +68,11 @@ return [
     'modelsToTrack' => [
         // Track changes to theme settings
         \Cms\Models\ThemeData::class,
+
+        // Example of per model configuration options
+        // \Cms\Models\ThemeData::class => [
+        //     'ignoredAttributes' => ['title'],
+        // ],
     ],
 
 ];

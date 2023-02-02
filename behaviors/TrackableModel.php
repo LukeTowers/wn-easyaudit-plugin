@@ -54,6 +54,12 @@ use Winter\Storm\Database\ModelBehavior as ModelBehaviorBase;
  *   public $trackableTrackChanges = true
  *
  *   /**
+ *    * @var array List of attributes to ignore when tracking changes on this model. Note that if an update event is triggered and there
+ *    * are no changes to the tracked attributes on the model, no activity will be logged.
+ *    * /
+ *   public $trackableIgnoredAttributes = []
+ *
+ *   /**
  *    * @var bool Manually control if the activities field gets automatically injected into backend forms
  *    * for this model (default from the luketowers.easyaudit.autoInjectActvitiesFormWidget config setting)
  *    * /

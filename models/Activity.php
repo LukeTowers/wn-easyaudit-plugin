@@ -79,7 +79,9 @@ class Activity extends Model
 
         if ($this->canTrackChanges()) {
             $changes = $this->getSubjectChanges();
-            if (!empty($changes)) {
+            if (empty($changes)) {
+                return false;
+            } else {
                 $this->properties = array_merge($this->properties ?? [], ['changes' => $changes]);
             }
         }
@@ -452,9 +454,12 @@ class Activity extends Model
             return [];
         }
 
-        $ignoredAttributes = [
-            'updated_at',
-        ];
+        $ignoredAttributes = array_merge(
+            [
+                'updated_at',
+            ],
+            $this->subject?->trackableIgnoredAttributes ?? []
+        );
 
         $changes = [];
         foreach ($this->subject->getChanges() as $key => $change) {
