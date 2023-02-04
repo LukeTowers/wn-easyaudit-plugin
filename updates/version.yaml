@@ -21,3 +21,4 @@
 3.0.7: 'Performance improvement for the System Activities dashboard widget'
 3.0.8: 'Improved support for embedding the ActivityLog form widget in nested popups'
 4.0.0: 'Dropped support for PHP < 8.0, added type hints, change tracking, unit tests, & control over the connection used.'
+4.0.1: 'Added direct links to the source / subject fields in the activity popup.'

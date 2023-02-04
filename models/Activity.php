@@ -2,9 +2,11 @@
 
 namespace LukeTowers\EasyAudit\Models;
 
+use Backend;
 use Config;
 use Lang;
 use Model;
+use Winter\Storm\Support\Str;
 
 /**
  * Activity Model
@@ -385,7 +387,76 @@ class Activity extends Model
     }
 
     /**
-     * Get the souces's name for human consumption
+     * Accessor for $activity->source_url attribute
+     */
+    public function getSourceUrlAttribute($value): ?string
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        if ($this->source) {
+            return $this->guessUrlForModel($this->source);
+        }
+    }
+
+    /**
+     * Accessor for $activity->subject_url attribute
+     */
+    public function getSubjectUrlAttribute($value): ?string
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        if ($this->subject) {
+            return $this->guessUrlForModel($this->subject);
+        }
+    }
+
+    /**
+     * Guess the backend preview URL for a model
+     * @TODO: add support for attributes on the subject model or the model passed itself
+     * for manually setting the URL
+     */
+    protected function guessUrlForModel(Model $model): ?string
+    {
+        $namespace = explode('\\', get_class($model));
+        $class = array_pop($namespace);
+
+        // Drop the last part of the namespace
+        array_pop($namespace);
+
+        // Generate the guessed namespace of the controller
+        $controllerClass = implode('\\', $namespace) . '\\Controllers\\' . Str::plural($class);
+
+        if (class_exists($controllerClass)) {
+            $controllerAction = 'preview';
+
+            $reflector = new \ReflectionClass($controllerClass);
+            $parts = pathinfo($reflector->getFileName());
+            $viewFolder = $parts['dirname'] . DIRECTORY_SEPARATOR . Str::lower($parts['filename'] . DIRECTORY_SEPARATOR);
+
+            $actions = ['preview', 'update'];
+            foreach ($actions as $action) {
+                if (file_exists($viewFolder . $action . '.php') || file_exists($viewFolder . $action . '.htm')) {
+                    $controllerAction = $action;
+                    break;
+                }
+            }
+
+            // Generate the guessed URL to the controller
+            return Backend::url(Str::lower(
+                implode('/', $namespace) . '/' .
+                Str::plural($class) . "/$controllerAction/" . $model->getKey()
+            ));
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the sources's name for human consumption
      */
     public function getSourceNameAttribute($value): string
     {

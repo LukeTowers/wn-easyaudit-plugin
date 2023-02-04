@@ -6,12 +6,16 @@ fields:
     source_name:
         label: luketowers.easyaudit::lang.models.activity.source
         span: left
+        type: partial
+        path: $/luketowers/easyaudit/models/activity/field.source_name.php
     event:
         label: luketowers.easyaudit::lang.models.activity.event
         span: right
     subject_name:
         label: luketowers.easyaudit::lang.models.activity.subject
         span: left
+        type: partial
+        path: $/luketowers/easyaudit/models/activity/field.subject_name.php
     created_at:
         label: luketowers.easyaudit::lang.models.activity.created_at
         span: right
