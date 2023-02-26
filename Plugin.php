@@ -207,6 +207,10 @@ class Plugin extends PluginBase
                 $config = [];
             }
 
+            if (!class_exists($modelClass)) {
+                continue;
+            }
+
             $modelClass::extend(function ($model) use ($config) {
                 $model->addDynamicProperty('trackableIgnoredAttributes', $config['ignoredAttributes'] ?? []);
                 $model->extendClassWith(TrackableModel::class);
