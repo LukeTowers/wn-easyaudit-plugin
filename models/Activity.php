@@ -417,6 +417,8 @@ class Activity extends Model
         if ($this->subject) {
             return $this->guessUrlForModel($this->subject);
         }
+
+        return null;
     }
 
     /**

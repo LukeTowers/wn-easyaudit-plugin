@@ -4,10 +4,12 @@
 
 columns:
     source_name:
-        type: text
+        type: partial
         label: luketowers.easyaudit::lang.models.activity.source
         searchable: false
         sortable: false
+        clickable: true
+        path: $/luketowers/easyaudit/models/activity/column.source_name.php
     event:
         label: luketowers.easyaudit::lang.models.activity.event
         type: text
