@@ -116,8 +116,13 @@ class Activity extends Model
      */
     public function canTrackChanges(): bool
     {
+        // Can't track changes if there is no subject
+        if (!$this->subject) {
+            return false;
+        }
+
         return (bool) (
-            $this->subject?->trackableTrackChanges
+            $this->subject->trackableTrackChanges
             ?? Config::get('luketowers.easyaudit::trackChanges', true)
         );
     }
