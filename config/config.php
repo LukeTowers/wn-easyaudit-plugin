@@ -30,6 +30,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Log Request's Referrer
+    |--------------------------------------------------------------------------
+    |
+    | By default, the URL for the request that triggers the logging action
+    | will get logged. Set this to false in order to
+    | disable that behaviour.
+    |
+    */
+
+    'logUrl' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Track changes in the source model's attributes
     |--------------------------------------------------------------------------
     |

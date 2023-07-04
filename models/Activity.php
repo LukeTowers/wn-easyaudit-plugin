@@ -79,6 +79,10 @@ class Activity extends Model
             $this->properties = array_merge($this->properties ?? [], ['user_agent' => $request->header('User-Agent')]);
         }
 
+        if ($this->canLogUrl()) {
+            $this->properties = array_merge($this->properties ?? [], ['url' => $request->fullUrl()]);
+        }
+
         if ($this->canTrackChanges()) {
             $changes = $this->getSubjectChanges();
             if (empty($changes)) {
@@ -108,6 +112,17 @@ class Activity extends Model
         return (bool) (
             $this->subject?->trackableLogUserAgent
             ?? Config::get('luketowers.easyaudit::logUserAgent', true)
+        );
+    }
+
+    /**
+     * Check to see if the url can be logged
+     */
+    public function canLogUrl(): bool
+    {
+        return (bool) (
+            $this->subject?->trackableLogUrl
+            ?? Config::get('luketowers.easyaudit::logUrl', true)
         );
     }
 
@@ -403,6 +418,8 @@ class Activity extends Model
         if ($this->source) {
             return $this->guessUrlForModel($this->source);
         }
+
+        return null;
     }
 
     /**
@@ -471,14 +488,27 @@ class Activity extends Model
             return $value;
         }
 
-        $prefix = basename(str_replace('\\', '/', $this->source_type)) . ': ';
-        if ($this->source) {
-            $sourceKey = $this->source->name ?: $this->source->title ?: $this->source->getKey();
+        $prefix = '';
+        $sourceKey = '';
+
+        if (!empty($this->source_type)) {
+            $prefix = basename(str_replace('\\', '/', $this->source_type));
+            if ($this->source) {
+                $sourceKey = $this->source->name ?: $this->source->title ?: $this->source->getKey();
+            } else {
+                $sourceKey = $this->source_id;
+            }
         } else {
-            $sourceKey = $this->source_key;
+            $sourceProperties = ['user_agent', 'ip_address', 'url'];
+            foreach ($sourceProperties as $property) {
+                if (!empty($this->properties[$property])) {
+                    $prefix = Str::title($property);
+                    $sourceKey = $this->properties[$property];
+                }
+            }
         }
 
-        return $prefix . $sourceKey;
+        return !empty($prefix) ? $prefix . ': ' . $sourceKey : $sourceKey;
     }
 
     /**

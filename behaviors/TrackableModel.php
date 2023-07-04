@@ -49,6 +49,11 @@ use Winter\Storm\Database\ModelBehavior as ModelBehaviorBase;
  *   public $trackableLogUserAgent = true
  *
  *   /**
+ *    * @var bool Manually control the URL logging on this model (default from the luketowers.easyaudit.logUrl config setting)
+ *    * /
+ *   public $trackableLogUrl = true
+ *
+ *   /**
  *    * @var bool Manually control the change tracking on this model (default from the luketowers.easyaudit.trackChanges config setting)
  *    * /
  *   public $trackableTrackChanges = true
