@@ -95,6 +95,9 @@ class TrackableModel extends ModelBehaviorBase
         // Setup the inverse of the polymorphic ActivityModel relationship to this model
         $model->morphMany['activities'] = [Activity::class, 'name' => 'subject'];
 
+        // Hide activities from the array version of the model
+        $model->addHidden(['activities']);
+
         // Instantiate the logger, setting the subject to this model
         $this->logger = new ActivityLogger();
 
