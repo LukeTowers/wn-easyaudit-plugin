@@ -85,9 +85,7 @@ class Activity extends Model
 
         if ($this->canTrackChanges()) {
             $changes = $this->getSubjectChanges();
-            if (empty($changes)) {
-                return false;
-            } else {
+            if (!empty($changes)) {
                 $this->properties = array_merge($this->properties ?? [], ['changes' => $changes]);
             }
         }
