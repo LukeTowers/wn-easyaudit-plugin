@@ -19,6 +19,7 @@ return [
             'source_user'  => 'User',
             'created_at'   => 'Activity Date',
             'ip_address'   => 'IP Address',
+            'url'          => 'URL',
             'changes'      => 'Changes',
             'no_changes'   => 'No changes captured by event',
             'change_from'  => 'From',

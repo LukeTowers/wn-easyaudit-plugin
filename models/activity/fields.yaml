@@ -31,10 +31,16 @@ tabs:
             type: partial
             path: $/luketowers/easyaudit/models/activity/field.diff.php
             span: full
+        properties[url]:
+            tab: luketowers.easyaudit::lang.models.activity.tab_request
+            label: luketowers.easyaudit::lang.models.activity.url
+            type: partial
+            path: $/luketowers/easyaudit/models/activity/field.url.php
+            span: auto
         ip_address:
             tab: luketowers.easyaudit::lang.models.activity.tab_request
             label: luketowers.easyaudit::lang.models.activity.ip_address
-            span: left
+            span: auto
         properties[user_agent]:
             tab: luketowers.easyaudit::lang.models.activity.tab_request
             label: luketowers.easyaudit::lang.models.activity.user_agent
