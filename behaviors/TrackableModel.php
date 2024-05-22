@@ -2,6 +2,7 @@
 
 namespace LukeTowers\EasyAudit\Behaviors;
 
+use Backend\Models\User;
 use BackendAuth;
 use Config;
 use LukeTowers\EasyAudit\Classes\ActivityLogger;
@@ -93,7 +94,7 @@ class TrackableModel extends ModelBehaviorBase
         $model = $this->model;
 
         // Setup the inverse of the polymorphic ActivityModel relationship to this model
-        $model->morphMany['activities'] = [Activity::class, 'name' => 'subject'];
+        $model->addMorphManyRelation('activities', [Activity::class, 'name' => 'subject']);
 
         // Hide activities from the array version of the model
         $model->addHidden(['activities']);
@@ -173,13 +174,6 @@ class TrackableModel extends ModelBehaviorBase
             $this->logger->inLog($this->model->trackableGetLogName($this->model));
         } else {
             $this->logger->inLog($this->trackableGetLogName($this->model));
-        }
-
-        // Default the source to the currently logged in backend user (if there is one)
-        // ensuring that impersonators are logged as the true source of the activity
-        $user = BackendAuth::getRealUser();
-        if ($user) {
-            $this->logger->by($user);
         }
 
         $this->loggerPopulated = true;

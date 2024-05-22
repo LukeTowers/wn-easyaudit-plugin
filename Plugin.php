@@ -7,6 +7,7 @@ use Backend\Models\User;
 use Config;
 use Event;
 use LukeTowers\EasyAudit\Behaviors\TrackableModel;
+use LukeTowers\EasyAudit\Models\Activity;
 use System\Classes\PluginBase;
 
 /**
@@ -271,6 +272,67 @@ class Plugin extends PluginBase
                     return $model->first_name . ' ' . $model->last_name;
                 });
             }
+
+            // Setup the inverse of the polymorphic ActivityModel relationship to this model
+            $model->addMorphManyRelation('user_activities', [Activity::class, 'name' => 'source']);
+
+            // Hide activities from the array version of the model
+            $model->addHidden(['user_activities']);
+        });
+
+        // Add the audit log to models implementing trackable model
+        Event::listen('backend.form.extendFieldsBefore', function (\Backend\Widgets\Form $widget) {
+            if (
+                $widget->isNested
+                || !($widget->model instanceof User)
+                || !($widget->getController() instanceof \Backend\Controllers\Users)
+            ) {
+                return;
+            }
+
+            $tabsFields = $widget->tabs['fields'] ?? [];
+            $secondaryTabsFields = $widget->secondaryTabs['fields'] ?? [];
+            $location = (count($tabsFields) > count($secondaryTabsFields)) ? 'tabs' : 'secondaryTabs';
+
+            if ($widget->context === 'myaccount') {
+                $widget->{$location}['fields'] = array_merge(${$location . 'Fields'}, [
+                    // Only users with view_all permissions should be able to see the audit log
+                    // for their own account as it could reveal sensitive information about the
+                    // system administrators
+                    'activities@myaccount' => [
+                        'tab' => 'luketowers.easyaudit::lang.models.activity.audit_log',
+                        'type' => 'activitylog',
+                        'permissions' => ['luketowers.easyaudit.activities.view_all'],
+                        'span' => 'full',
+                        'cssClass' => 'container'
+                    ],
+                    'own_activities' => [
+                        'tab' => 'luketowers.easyaudit::lang.models.activity.label_plural',
+                        'context' => ['myaccount'],
+                        'type' => 'activitylog',
+                        'permissions' => ['luketowers.easyaudit.activities.view_own'],
+                        'subject' => false,
+                        'source' => 'formModel',
+                        'span' => 'full',
+                        'cssClass' => 'container'
+                    ],
+                ]);
+            } else {
+                $widget->{$location}['fields'] = array_merge(${$location . 'Fields'}, [
+                    'user_activities' => [
+                        'tab' => 'luketowers.easyaudit::lang.models.activity.label_plural',
+                        'context' => ['update', 'preview'],
+                        'permissions' => ['luketowers.easyaudit.activities.view_all'],
+                        'type' => 'activitylog',
+                        'subject' => false,
+                        'source' => 'formModel',
+                        'span' => 'full',
+                        'cssClass' => 'container'
+                    ],
+                ]);
+            }
+
+            $widget->{$location}['icons']['luketowers.easyaudit::lang.models.activity.label_plural'] = 'icon-hourglass';
         });
     }
 }

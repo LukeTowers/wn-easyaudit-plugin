@@ -230,6 +230,27 @@ class ActivityLog extends FormWidgetBase
          * Prepare the list widget
          */
         $columnConfig = $this->makeConfig($listConfig->list);
+
+        if ($this->subject === false && $this->source === 'formModel') {
+            unset($columnConfig->columns['source_name']);
+            unset($columnConfig->columns['event']);
+            $columnConfig->columns = array_merge([
+                'event' => [
+                    'label' => 'luketowers.easyaudit::lang.models.activity.event',
+                    'type' => 'text',
+                    'searchable' => true,
+                ],
+                'subject_name' => [
+                    'type' => 'partial',
+                    'label' => 'luketowers.easyaudit::lang.models.activity.subject',
+                    'searchable' => false,
+                    'sortable' => false,
+                    'clickable' => true,
+                    'path' => '$/luketowers/easyaudit/models/activity/column.subject_name.php',
+                ],
+            ], $columnConfig->columns);
+        }
+
         $columnConfig->model = $model;
         $columnConfig->alias = $this->alias . 'List';
 
@@ -323,6 +344,38 @@ class ActivityLog extends FormWidgetBase
             $widget->cssClasses[] = 'list-flush';
 
             $filterConfig = $this->makeConfig($listConfig->filter);
+
+            if ($this->subject === false && $this->source === 'formModel') {
+                unset($filterConfig->scopes['source']);
+                $filterConfig->scopes = array_merge([
+                    'subject_type' => [
+                        'label' => 'luketowers.easyaudit::lang.models.activity.subject',
+                        'type' => 'group',
+                        'scope' => 'toSubjectTypes',
+                        'modelClass' => 'LukeTowers\EasyAudit\Models\Activity',
+                        'options' => 'getSubjectTypeOptions',
+                    ],
+                ], $filterConfig->scopes);
+
+                unset($columnConfig->columns['source_name']);
+                unset($columnConfig->columns['event']);
+                $columnConfig->columns = array_merge([
+                    'event' => [
+                        'label' => 'luketowers.easyaudit::lang.models.activity.event',
+                        'type' => 'text',
+                        'searchable' => true,
+                    ],
+                    'subject_name' => [
+                        'type' => 'partial',
+                        'label' => 'luketowers.easyaudit::lang.models.activity.subject',
+                        'searchable' => false,
+                        'sortable' => false,
+                        'clickable' => true,
+                        'path' => '$/luketowers/easyaudit/models/activity/column.subject_name.php',
+                    ],
+                ], $columnConfig->columns);
+            }
+
             $filterConfig->alias = $widget->alias . 'Filter';
             $filterWidget = $this->makeWidget('Backend\Widgets\Filter', $filterConfig);
             $filterWidget->bindToController();

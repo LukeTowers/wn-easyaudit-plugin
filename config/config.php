@@ -81,6 +81,7 @@ return [
     'modelsToTrack' => [
         // Track changes to theme settings
         \Cms\Models\ThemeData::class,
+        \Backend\Models\User::class,
 
         // Example of per model configuration options
         // \Cms\Models\ThemeData::class => [

@@ -2,10 +2,11 @@
 
 namespace LukeTowers\EasyAudit\Classes;
 
-use Config;
+use Backend\Facades\BackendAuth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 use LukeTowers\EasyAudit\Models\Activity as ActivityModel;
-use SystemException;
+use Winter\Storm\Exception\SystemException;
 
 /**
  * Activity Logger service class to log activities (events) on models
@@ -107,7 +108,8 @@ class ActivityLogger
         }
 
         // Deduplicate activities on the same request cycle
-        // @TODO: Somewhat unreliable, improve
+        // @TODO: Still doesn't prevent "duplicates" triggered by rapid succession of requests
+        // i.e. user goes to update, accesses record, redirects to preview, accesses record - same timestamp will be issued.
         $cacheKey = 'luketowers.easyaudit.cachedRequestActivities';
         $this->bindEvent('afterLog', function () use ($cacheKey) {
             $activitiesLogged = Config::get($cacheKey, []);
@@ -198,6 +200,11 @@ class ActivityLogger
             $activity->subject = $this->subject;
         }
 
+        // Default the source to the currently logged in backend user (if there is one)
+        // ensuring that impersonators are logged as the true source of the activity
+        if (is_null($this->source)) {
+            $this->source = BackendAuth::getRealUser();
+        }
         if ($this->validateModel($this->source)) {
             $activity->source = $this->source;
         }

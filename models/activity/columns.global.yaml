@@ -16,7 +16,7 @@ columns:
         searchable: true
     subject_name:
         type: partial
-        label: luketowers.easyaudit::lang.models.activity.source
+        label: luketowers.easyaudit::lang.models.activity.subject
         searchable: false
         sortable: false
         clickable: true
