@@ -65,7 +65,7 @@ return [
     'widgets' => [
         'myactivities' => [
             'label'      => 'Mijn Activiteiten',
-            'no_records' => 'Geen activiteiten om te tonen. Het Oog van Sauron kijkt mee...',
+            'no_records' => 'Geen activiteiten om te tonen.',
         ],
         'systemactivities' => [
             'label'      => 'Systeemactiviteiten',
