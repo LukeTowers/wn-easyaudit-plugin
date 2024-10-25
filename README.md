@@ -4,6 +4,8 @@ Easily view and manage audit logs for models within your Winter CMS projects.
 
 # Installation
 
+This plugin requires a [paid license ($30 USD)](https://paypal.me/theluketowers/30USD).
+
 To install it with Composer, run `composer require luketowers/wn-easyaudit-plugin` from your project root.
 
 # Documentation
