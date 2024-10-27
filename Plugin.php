@@ -249,7 +249,7 @@ class Plugin extends PluginBase
                 $widget->{$location}['fields'] = array_merge(${$location . 'Fields'}, [
                     'activities' => [
                         'tab' => 'luketowers.easyaudit::lang.models.activity.audit_log',
-                        'context' => ['update', 'preview'],
+                        'context' => ['update', 'preview', 'relation'],
                         'type' => 'activitylog',
                         'span' => 'full',
                         'cssClass' => 'container'
