@@ -202,6 +202,8 @@ class ActivityLogger
 
         // Default the source to the currently logged in backend user (if there is one)
         // ensuring that impersonators are logged as the true source of the activity
+        // @TODO: Add support for detecting frontend users as the source of the activity 
+        // if there is no backend user set.
         if (is_null($this->source)) {
             $this->source = BackendAuth::getRealUser();
         }
