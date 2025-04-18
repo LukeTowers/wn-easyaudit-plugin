@@ -2,13 +2,14 @@
 
 namespace LukeTowers\EasyAudit;
 
-use Backend;
+use Backend\Facades\Backend;
 use Backend\Models\User;
-use Config;
-use Event;
 use LukeTowers\EasyAudit\Behaviors\TrackableModel;
 use LukeTowers\EasyAudit\Models\Activity;
 use System\Classes\PluginBase;
+use System\Classes\PluginManager;
+use Winter\Storm\Support\Facades\Config;
+use Winter\Storm\Support\Facades\Event;
 
 /**
  * EasyAudit Plugin Information File
@@ -134,6 +135,9 @@ class Plugin extends PluginBase
      */
     public function boot(): void
     {
+        if (PluginManager::$noInit && $this->app->runningInConsole()) {
+            return;
+        }
         $this->registerMediaLibraryTracking();
         $this->registerModelTracking();
         $this->extendBackendForms();
