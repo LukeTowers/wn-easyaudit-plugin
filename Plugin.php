@@ -5,6 +5,8 @@ namespace LukeTowers\EasyAudit;
 use Backend\Facades\Backend;
 use Backend\Models\User;
 use LukeTowers\EasyAudit\Behaviors\TrackableModel;
+use LukeTowers\EasyAudit\FormWidgets\ActivityLog;
+use LukeTowers\EasyAudit\FormWidgets\ChangeViewer;
 use LukeTowers\EasyAudit\Models\Activity;
 use System\Classes\PluginBase;
 use System\Classes\PluginManager;
@@ -103,7 +105,8 @@ class Plugin extends PluginBase
     public function registerFormWidgets(): array
     {
         return [
-            \LukeTowers\EasyAudit\FormWidgets\ActivityLog::class => 'activitylog',
+            ActivityLog::class => 'activitylog',
+            ChangeViewer::class => 'changeviewer',
         ];
     }
 

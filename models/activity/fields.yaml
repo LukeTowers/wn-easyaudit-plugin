@@ -28,8 +28,7 @@ tabs:
         properties[changes]:
             tab: luketowers.easyaudit::lang.models.activity.changes
             label: ""
-            type: partial
-            path: $/luketowers/easyaudit/models/activity/field.diff.php
+            type: changeviewer
             span: full
         properties[url]:
             tab: luketowers.easyaudit::lang.models.activity.tab_request

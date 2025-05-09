@@ -405,6 +405,11 @@ class ActivityLog extends FormWidgetBase
         return $this->listWidget = $widget;
     }
 
+    public function onActivityLogRefresh()
+    {
+        return $this->getListWidget()->onRefresh();
+    }
+
     /**
      * @inheritDoc
      */

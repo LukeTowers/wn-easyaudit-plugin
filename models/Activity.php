@@ -567,6 +567,14 @@ class Activity extends Model
             $this->subject?->trackableIgnoredAttributes ?? []
         );
 
+        $encryptedAttributes = $this->subject->methodExists('getEncryptableAttributes')
+            ? $this->subject->getEncryptableAttributes()
+            : [];
+
+        $crypt = $this->subject->methodExists('getEncrypter')
+            ? $this->subject->getEncrypter()
+            : null;
+
         $changes = [];
         foreach ($this->subject->getChanges() as $key => $change) {
             if (in_array($key, $ignoredAttributes)) {
@@ -575,6 +583,21 @@ class Activity extends Model
 
             $from = $this->subject->getOriginal($key);
             $to = $change;
+
+            // Handle encrypted comparison
+            if (in_array($key, $encryptedAttributes) && $crypt) {
+                try {
+                    $fromDecrypted = $crypt->decrypt($from);
+                    $toDecrypted = $crypt->decrypt($to);
+
+                    // If decrypted values are equal, skip logging
+                    if ($fromDecrypted == $toDecrypted) {
+                        continue;
+                    }
+                } catch (\Throwable $ex) {
+                    // Decryption failed — fall back to raw comparison
+                }
+            }
 
             // Ignore null => '' changes
             if (is_null($from) && $to === '') {

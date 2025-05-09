@@ -23,3 +23,7 @@
 4.0.0: 'Dropped support for PHP < 8.0, added type hints, change tracking, unit tests, & control over the connection used.'
 4.0.1: 'Added direct links to the source / subject fields in the activity popup.'
 4.1.0: 'Add support for tracking backend users and displaying the URL of a tracked activity when present'
+4.2.0:
+    - 'Improve the JSON diff viewing experience'
+    - 'Automatically decrypt encrypted fields for diff viewing'
+    - 'Added ability to refresh the activitylog widget when toolbar is enabled'
