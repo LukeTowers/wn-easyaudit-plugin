@@ -152,7 +152,7 @@ class TrackableModel extends ModelBehaviorBase
         });
 
         // Setup the event tracking if desired by the model implementing this behavior
-        $this->setupEventTracking($model);
+        $this->setupEventTracking();
     }
 
     /**
@@ -202,18 +202,17 @@ class TrackableModel extends ModelBehaviorBase
     }
 
     /**
-     * Setup the event tracking on the provided model
-     *
-     * @var Model $model The model to setup the tracking on
+     * Setup the event tracking on the model
      */
-    protected function setupEventTracking($model)
+    protected function setupEventTracking()
     {
+        $model = $this->model;
         if (empty($model->trackableEvents) && !is_array($model->trackableEvents)) {
             return;
         }
 
         // Create the callback function that will be triggered by every tracked event
-        $callable = function () use ($model) {
+        $callable = function () {
             // Don't bother going any further if the logger hasn't been populated yet
             if (!$this->loggerPopulated) {
                 return;
@@ -229,7 +228,7 @@ class TrackableModel extends ModelBehaviorBase
 
             // NOTE: may want to support custom model events, which would also include passing the custom
             // event's arguments to this method as well)
-            $this->triggerModelActivity($model, $eventName);
+            $this->logActivityFromEvent($eventName);
         };
 
         // Loop through the events to track
@@ -243,13 +242,11 @@ class TrackableModel extends ModelBehaviorBase
     }
 
     /**
-     * Handle logging a model event as an activity
-     *
-     * @param Model $model The model that the event has been triggered on
-     * @param string $event The name of the event that has been triggered
+     * Logs a model event as an activity
      */
-    protected function triggerModelActivity($model, $eventName = null)
+    public function logActivityFromEvent(?string $eventName = null)
     {
+        $model = $this->model;
         // Initialize the default information for the activity to be logged
         $activityName = 'modelEventFired';
         $activityDescription = 'A model event was fired';
