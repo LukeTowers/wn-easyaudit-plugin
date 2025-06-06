@@ -326,7 +326,7 @@ class Plugin extends PluginBase
                 ]);
             } else {
                 $widget->{$location}['fields'] = array_merge(${$location . 'Fields'}, [
-                    'user_activities' => [
+                    '_user_activities' => [
                         'tab' => 'luketowers.easyaudit::lang.models.activity.label_plural',
                         'context' => ['update', 'preview'],
                         'permissions' => ['luketowers.easyaudit.activities.view_all'],
