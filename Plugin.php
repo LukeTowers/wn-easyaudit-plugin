@@ -10,6 +10,7 @@ use LukeTowers\EasyAudit\FormWidgets\ChangeViewer;
 use LukeTowers\EasyAudit\Models\Activity;
 use System\Classes\PluginBase;
 use System\Classes\PluginManager;
+use Winter\Storm\Exception\SystemException;
 use Winter\Storm\Support\Facades\Config;
 use Winter\Storm\Support\Facades\Event;
 
@@ -38,6 +39,11 @@ use Winter\Storm\Support\Facades\Event;
  */
 class Plugin extends PluginBase
 {
+    /**
+     * @var array Form sections the activities FormWidget can be explicitly injected into
+     */
+    const ACTIVITIES_FORM_WIDGET_LOCATIONS = ['fields', 'tabs', 'secondaryTabs'];
+
     /**
      * @var bool Plugin requires elevated permissions in order to continue logging changes
      * in privileged areas of the application
@@ -241,19 +247,16 @@ class Plugin extends PluginBase
                         method_exists($widget->model, 'isClassExtendedWith')
                         && !$widget->model->isClassExtendedWith(TrackableModel::class)
                     )
-                    || !(
-                        $widget->model->trackableInjectActvitiesFormWidget
-                        ?? Config::get('luketowers.easyaudit.autoInjectActvitiesFormWidget', true)
-                    )
                 ) {
                     return;
                 }
 
-                $tabsFields = $widget->tabs['fields'] ?? [];
-                $secondaryTabsFields = $widget->secondaryTabs['fields'] ?? [];
-                $location = (count($tabsFields) > count($secondaryTabsFields)) ? 'tabs' : 'secondaryTabs';
+                $location = $this->resolveActivitiesFormWidgetLocation($widget);
+                if (empty($location)) {
+                    return;
+                }
 
-                $widget->{$location}['fields'] = array_merge(${$location . 'Fields'}, [
+                $widget->{$location}['fields'] = array_merge($widget->{$location}['fields'] ?? [], [
                     'activities' => [
                         'tab' => 'luketowers.easyaudit::lang.models.activity.audit_log',
                         'context' => ['update', 'preview', 'relation'],
@@ -262,9 +265,55 @@ class Plugin extends PluginBase
                         'cssClass' => 'container'
                     ],
                 ]);
-                $widget->{$location}['icons']['luketowers.easyaudit::lang.models.activity.audit_log'] = 'icon-eye';
+
+                // The outside fields aren't tabbed, so there's no tab to put an icon on.
+                if ($location !== 'fields') {
+                    $widget->{$location}['icons']['luketowers.easyaudit::lang.models.activity.audit_log'] = 'icon-eye';
+                }
             });
         }
+    }
+
+    /**
+     * Resolve which section of the provided form the activities FormWidget should be
+     * injected into, from the model's $trackableInjectActivitiesFormWidget property
+     * (falling back to the luketowers.easyaudit.autoInjectActivitiesFormWidget config
+     * setting). Accepted values:
+     *
+     *   false            Don't inject the widget
+     *   true             Inject it into whichever tab section already holds the most fields
+     *   'fields'         Inject it into the form's outside fields
+     *   'tabs'           Inject it into the form's primary tabs
+     *   'secondaryTabs'  Inject it into the form's secondary tabs
+     *
+     * @return string|null The form section to inject into, or null to skip injection
+     */
+    protected function resolveActivitiesFormWidgetLocation(\Backend\Widgets\Form $widget): ?string
+    {
+        $location = $widget->model->trackableInjectActivitiesFormWidget
+            ?? Config::get('luketowers.easyaudit.autoInjectActivitiesFormWidget', true);
+
+        // Default to whichever section is already carrying the bulk of the form.
+        if ($location === true) {
+            return count($widget->tabs['fields'] ?? []) > count($widget->secondaryTabs['fields'] ?? [])
+                ? 'tabs'
+                : 'secondaryTabs';
+        }
+
+        if (in_array($location, static::ACTIVITIES_FORM_WIDGET_LOCATIONS, true)) {
+            return $location;
+        }
+
+        if (!empty($location)) {
+            throw new SystemException(sprintf(
+                'Invalid $trackableInjectActivitiesFormWidget value (%s) on %s. Expected true, false, or one of: %s',
+                var_export($location, true),
+                get_class($widget->model),
+                "'" . implode("', '", static::ACTIVITIES_FORM_WIDGET_LOCATIONS) . "'"
+            ));
+        }
+
+        return null;
     }
 
     /**

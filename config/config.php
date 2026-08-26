@@ -63,9 +63,14 @@ return [
     | any forms whose model's implement the TrackableModel behaviour. Set
     | this to false in order to disable that behaviour.
     |
+    | true is placed in whichever tab section already holds the most fields;
+    | set 'fields', 'tabs', or 'secondaryTabs' to place it explicitly instead.
+    | Individual models can override this with their
+    | $trackableInjectActivitiesFormWidget property.
+    |
     */
 
-    'autoInjectActvitiesFormWidget' => true,
+    'autoInjectActivitiesFormWidget' => true,
 
     /*
     |--------------------------------------------------------------------------

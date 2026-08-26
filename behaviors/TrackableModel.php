@@ -66,10 +66,12 @@ use Winter\Storm\Database\ModelBehavior as ModelBehaviorBase;
  *   public $trackableIgnoredAttributes = []
  *
  *   /**
- *    * @var bool Manually control if the activities field gets automatically injected into backend forms
- *    * for this model (default from the luketowers.easyaudit.autoInjectActvitiesFormWidget config setting)
+ *    * @var bool|string Manually control if (and where) the activities field gets automatically injected
+ *    * into backend forms for this model (default from the luketowers.easyaudit.autoInjectActivitiesFormWidget
+ *    * config setting). false to skip injection, true to place it in whichever tab section already holds the
+ *    * most fields, or 'fields' / 'tabs' / 'secondaryTabs' to place it explicitly.
  *    * /
- *   public $trackableInjectActvitiesFormWidget = true
+ *   public $trackableInjectActivitiesFormWidget = true
  *
  * @package luketowers/oc-easyaudit-plugin
  * @author Luke Towers

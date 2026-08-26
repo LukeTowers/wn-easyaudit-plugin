@@ -27,3 +27,6 @@
     - 'Improve the JSON diff viewing experience'
     - 'Automatically decrypt encrypted fields for diff viewing'
     - 'Added ability to refresh the activitylog widget when toolbar is enabled'
+4.3.0:
+    - 'Renamed $trackableInjectActvitiesFormWidget to $trackableInjectActivitiesFormWidget and the autoInjectActvitiesFormWidget config key to autoInjectActivitiesFormWidget, correcting a long-standing typo. The old spelling is no longer read.'
+    - 'Added explicit control over which section of a form the activities widget is injected into: set the property (or config key) to "fields", "tabs" or "secondaryTabs" instead of true to override the default largest-section heuristic.'
