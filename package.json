@@ -1,6 +1,6 @@
 {
     "name": "luketowers-easyaudit",
     "dependencies": {
-        "jsondiffpatch": "^0.7.3"
+        "jsondiffpatch": "^0.7.6"
     }
 }
