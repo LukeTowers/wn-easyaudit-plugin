@@ -226,7 +226,15 @@ class Plugin extends PluginBase
             }
 
             $modelClass::extend(function ($model) use ($config) {
-                $model->addDynamicProperty('trackableIgnoredAttributes', $config['ignoredAttributes'] ?? []);
+                // Only inject when the config actually specifies it. An
+                // unconditional call adds an empty dynamic property, and
+                // dynamic properties take precedence over real ones in
+                // ExtendableTrait::extendableGet(), so a model that declares
+                // its own $trackableIgnoredAttributes would have it shadowed
+                // purely by being listed in modelsToTrack.
+                if (array_key_exists('ignoredAttributes', $config)) {
+                    $model->addDynamicProperty('trackableIgnoredAttributes', $config['ignoredAttributes']);
+                }
                 $model->extendClassWith(TrackableModel::class);
             });
         }
