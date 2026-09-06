@@ -30,3 +30,5 @@
 4.3.0:
     - 'Renamed $trackableInjectActvitiesFormWidget to $trackableInjectActivitiesFormWidget and the autoInjectActvitiesFormWidget config key to autoInjectActivitiesFormWidget, correcting a long-standing typo. The old spelling is no longer read.'
     - 'Added explicit control over which section of a form the activities widget is injected into: set the property (or config key) to "fields", "tabs" or "secondaryTabs" instead of true to override the default largest-section heuristic.'
+4.3.1:
+    - 'Fixed per-model trackable overrides being ignored when registered dynamically (as the modelsToTrack config does), so ignoredAttributes and the logging flags now take effect.'

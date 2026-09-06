@@ -92,12 +92,48 @@ class Activity extends Model
     }
 
     /**
+     * Read a `trackable*` override declared on the subject model.
+     *
+     * Deliberately avoids `$this->subject->foo ?? $default`. The null-coalescing
+     * operator consults `__isset()` before `__get()`, and ExtendableTrait
+     * provides no `__isset()`, so Eloquent's runs instead and only sees real
+     * attributes and relations. Properties registered through
+     * `addDynamicProperty()` — which is how {@see \LukeTowers\EasyAudit\Plugin::registerModelTracking()}
+     * applies the `modelsToTrack` config to models that do not declare the
+     * behaviour themselves — are readable via `__get()` but invisible to
+     * `isset()`, so every such override silently fell back to the default.
+     *
+     * Models that declare these as real class properties were unaffected, which
+     * is why this went unnoticed.
+     */
+    protected function getSubjectTrackableProperty(string $property, mixed $default = null): mixed
+    {
+        if (!$this->subject) {
+            return $default;
+        }
+
+        if (
+            !$this->subject->methodExists('propertyExists')
+            || !$this->subject->propertyExists($property)
+        ) {
+            return $default;
+        }
+
+        // Read into a variable before the null check. `$subject->$property ??`
+        // would re-introduce the very bug this method exists to avoid, because
+        // `??` on a property access consults __isset().
+        $value = $this->subject->{$property};
+
+        return $value ?? $default;
+    }
+
+    /**
      * Check to see if the IP address can be logged
      */
     public function canLogIpAddress(): bool
     {
         return (bool) (
-            $this->subject?->trackableLogIpAddress
+            $this->getSubjectTrackableProperty('trackableLogIpAddress')
             ?? Config::get('luketowers.easyaudit::logIpAddress', true)
         );
     }
@@ -108,7 +144,7 @@ class Activity extends Model
     public function canLogUserAgent(): bool
     {
         return (bool) (
-            $this->subject?->trackableLogUserAgent
+            $this->getSubjectTrackableProperty('trackableLogUserAgent')
             ?? Config::get('luketowers.easyaudit::logUserAgent', true)
         );
     }
@@ -119,7 +155,7 @@ class Activity extends Model
     public function canLogUrl(): bool
     {
         return (bool) (
-            $this->subject?->trackableLogUrl
+            $this->getSubjectTrackableProperty('trackableLogUrl')
             ?? Config::get('luketowers.easyaudit::logUrl', true)
         );
     }
@@ -135,7 +171,7 @@ class Activity extends Model
         }
 
         return (bool) (
-            $this->subject->trackableTrackChanges
+            $this->getSubjectTrackableProperty('trackableTrackChanges')
             ?? Config::get('luketowers.easyaudit::trackChanges', true)
         );
     }
@@ -564,7 +600,7 @@ class Activity extends Model
             [
                 'updated_at',
             ],
-            $this->subject?->trackableIgnoredAttributes ?? []
+            (array) $this->getSubjectTrackableProperty('trackableIgnoredAttributes', [])
         );
 
         $encryptedAttributes = $this->subject->methodExists('getEncryptableAttributes')
