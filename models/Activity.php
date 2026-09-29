@@ -220,7 +220,7 @@ class Activity extends Model
     public function scopeForSubject($query, $subject)
     {
         return $query
-            ->where('subject_type', get_class($subject))
+            ->whereIn('subject_type', static::morphTypesOf($subject))
             ->where('subject_id', $subject->getKey());
     }
 
@@ -234,8 +234,18 @@ class Activity extends Model
     public function scopeFromSource($query, $source)
     {
         return $query
-            ->where('source_type', get_class($source))
+            ->whereIn('source_type', static::morphTypesOf($source))
             ->where('source_id', $source->getKey());
+    }
+
+    /**
+     * The *_type values a model's activities can be stored under. The morph
+     * relations write the morph map alias once the app registers one, while
+     * rows logged before that still hold the class name.
+     */
+    public static function morphTypesOf(Model $model): array
+    {
+        return array_values(array_unique([$model->getMorphClass(), get_class($model)]));
     }
 
     /**
