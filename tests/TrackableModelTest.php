@@ -2,6 +2,7 @@
 
 namespace LukeTowers\EasyAudit\Tests;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use LukeTowers\EasyAudit\Models\Activity;
 use System\Models\RequestLog;
 use System\Tests\Bootstrap\PluginTestCase;
@@ -20,6 +21,13 @@ class TrackableModelTest extends PluginTestCase
             $model->addDynamicProperty('trackableEvents', ['model.afterCreate', 'model.afterUpdate']);
             $model->extendClassWith(\LukeTowers\EasyAudit\Behaviors\TrackableModel::class);
         });
+    }
+
+    public function tearDown(): void
+    {
+        Relation::morphMap([], false);
+
+        parent::tearDown();
     }
 
     public function testModelEventsAreTracked()
@@ -116,6 +124,37 @@ class TrackableModelTest extends PluginTestCase
         $this->assertNotNull($activity);
         $this->assertNull($activity->ip_address, 'IP address was logged despite the model opting out.');
         $this->assertArrayNotHasKey('user_agent', $activity->properties ?? []);
+    }
+
+    /**
+     * The morph relations store a model's morph map alias as its subject_type,
+     * so the lookup has to match on the alias rather than on the class name.
+     */
+    public function testActivitiesStoredUnderAMorphAliasAreFoundForTheSubject()
+    {
+        Relation::morphMap(['request_log' => RequestLog::class]);
+
+        $record = RequestLog::create(['url' => 'http://example.com', 'status_code' => 200]);
+
+        $this->assertSame(['request_log'], Activity::forSubject($record)->pluck('subject_type')->all());
+    }
+
+    /**
+     * Rows logged before the app registered the alias still hold the class name.
+     */
+    public function testActivitiesStoredBeforeTheMorphAliasAreStillFoundForTheSubject()
+    {
+        $record = RequestLog::create(['url' => 'http://example.com', 'status_code' => 200]);
+
+        Relation::morphMap(['request_log' => RequestLog::class]);
+
+        $record->status_code = 404;
+        $record->save();
+
+        $this->assertEqualsCanonicalizing(
+            [RequestLog::class, 'request_log'],
+            Activity::forSubject($record)->pluck('subject_type')->all()
+        );
     }
 
     // @TODO: Finish implementing

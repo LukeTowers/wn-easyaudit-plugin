@@ -5,6 +5,7 @@ namespace LukeTowers\EasyAudit\FormWidgets;
 use Backend\Classes\FormField;
 use Backend\Classes\FormWidgetBase;
 use BackendAuth;
+use LukeTowers\EasyAudit\Models\Activity;
 use Model;
 
 /**
@@ -290,7 +291,7 @@ class ActivityLog extends FormWidgetBase
                 if (!empty($subject->getKey())) {
                     $query->forSubject($subject);
                 } else {
-                    $query->where('subject_type', get_class($subject));
+                    $query->whereIn('subject_type', Activity::morphTypesOf($subject));
                 }
             }
 
@@ -299,7 +300,7 @@ class ActivityLog extends FormWidgetBase
                 if (!empty($source->getKey())) {
                     $query->fromSource($source);
                 } else {
-                    $query->where('source_type', get_class($source));
+                    $query->whereIn('source_type', Activity::morphTypesOf($source));
                 }
             }
         });
